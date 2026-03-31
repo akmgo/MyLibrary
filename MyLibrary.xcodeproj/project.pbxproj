@@ -13,12 +13,26 @@
 		C582E1BB2F7B690D00C95473 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1AE2F7B665200C95473 /* Book.swift */; };
 		C582E1BC2F7B692000C95473 /* Excerpt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1AF2F7B668100C95473 /* Excerpt.swift */; };
 		C582E1C52F7B6EFE00C95473 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B62F7B679300C95473 /* HomeView.swift */; };
-		C582E1C62F7B6F0400C95473 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B52F7B677D00C95473 /* ContentView.swift */; };
 		C582E1C72F7B6F2300C95473 /* ArchiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B82F7B67B600C95473 /* ArchiveView.swift */; };
 		C582E1C82F7B6F2900C95473 /* YearlyTimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1BE2F7B6B2800C95473 /* YearlyTimelineView.swift */; };
 		C582E1C92F7B6F2F00C95473 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1BA2F7B67D800C95473 /* BookDetailView.swift */; };
 		C582E1CA2F7B6F3400C95473 /* BookDossierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1BD2F7B6AB400C95473 /* BookDossierView.swift */; };
 		C582E1CC2F7B77F300C95473 /* LocalCoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1CB2F7B77F300C95473 /* LocalCoverView.swift */; };
+		C582E1D52F7BA55800C95473 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1D42F7BA55800C95473 /* HeaderView.swift */; };
+		C582E1D72F7BA56400C95473 /* CurrentReadingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */; };
+		C582E1D92F7BA57200C95473 /* DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1D82F7BA57200C95473 /* DashboardWidget.swift */; };
+		C582E1DB2F7BA58000C95473 /* CarouselWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */; };
+		C582E1DE2F7BB34E00C95473 /* HeroBookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1DD2F7BB34E00C95473 /* HeroBookCard.swift */; };
+		C582E1E02F7BB35C00C95473 /* ReadingProgressCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1DF2F7BB35C00C95473 /* ReadingProgressCard.swift */; };
+		C582E1E22F7BB36800C95473 /* BoomDecorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1E12F7BB36800C95473 /* BoomDecorCard.swift */; };
+		C582E1E42F7BBDFD00C95473 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1E32F7BBDFD00C95473 /* PreviewData.swift */; };
+		C582E1E72F7BC53000C95473 /* CheckInButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1E62F7BC53000C95473 /* CheckInButton.swift */; };
+		C582E1EB2F7BC54D00C95473 /* WeeklyEnergyMatrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1EA2F7BC54D00C95473 /* WeeklyEnergyMatrix.swift */; };
+		C582E1ED2F7BC62700C95473 /* DashboardUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1EC2F7BC62700C95473 /* DashboardUtils.swift */; };
+		C582E1EF2F7BC64000C95473 /* YearReadingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1EE2F7BC64000C95473 /* YearReadingCard.swift */; };
+		C582E1F12F7BC65B00C95473 /* MonthReadingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1F02F7BC65B00C95473 /* MonthReadingCard.swift */; };
+		C582E1F32F7BC6CC00C95473 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */; };
+		C5DCF76E2F7BCD8D00428041 /* CarouselCardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DCF76D2F7BCD8D00428041 /* CarouselCardItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,13 +61,27 @@
 		C582E1AF2F7B668100C95473 /* Excerpt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Excerpt.swift; sourceTree = "<group>"; };
 		C582E1B02F7B66CF00C95473 /* View+GlassEffect.swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+GlassEffect.swift.swift"; sourceTree = "<group>"; };
 		C582E1B22F7B66FA00C95473 /* BookCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCardView.swift; sourceTree = "<group>"; };
-		C582E1B52F7B677D00C95473 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C582E1B62F7B679300C95473 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		C582E1B82F7B67B600C95473 /* ArchiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveView.swift; sourceTree = "<group>"; };
 		C582E1BA2F7B67D800C95473 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
 		C582E1BD2F7B6AB400C95473 /* BookDossierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDossierView.swift; sourceTree = "<group>"; };
 		C582E1BE2F7B6B2800C95473 /* YearlyTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyTimelineView.swift; sourceTree = "<group>"; };
 		C582E1CB2F7B77F300C95473 /* LocalCoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCoverView.swift; sourceTree = "<group>"; };
+		C582E1D42F7BA55800C95473 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
+		C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentReadingWidget.swift; sourceTree = "<group>"; };
+		C582E1D82F7BA57200C95473 /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
+		C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselWidget.swift; sourceTree = "<group>"; };
+		C582E1DD2F7BB34E00C95473 /* HeroBookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBookCard.swift; sourceTree = "<group>"; };
+		C582E1DF2F7BB35C00C95473 /* ReadingProgressCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingProgressCard.swift; sourceTree = "<group>"; };
+		C582E1E12F7BB36800C95473 /* BoomDecorCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoomDecorCard.swift; sourceTree = "<group>"; };
+		C582E1E32F7BBDFD00C95473 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
+		C582E1E62F7BC53000C95473 /* CheckInButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInButton.swift; sourceTree = "<group>"; };
+		C582E1EA2F7BC54D00C95473 /* WeeklyEnergyMatrix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyEnergyMatrix.swift; sourceTree = "<group>"; };
+		C582E1EC2F7BC62700C95473 /* DashboardUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardUtils.swift; sourceTree = "<group>"; };
+		C582E1EE2F7BC64000C95473 /* YearReadingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearReadingCard.swift; sourceTree = "<group>"; };
+		C582E1F02F7BC65B00C95473 /* MonthReadingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthReadingCard.swift; sourceTree = "<group>"; };
+		C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		C5DCF76D2F7BCD8D00428041 /* CarouselCardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselCardItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -106,7 +134,7 @@
 				C582E1D12F7B828300C95473 /* ViewModels */,
 				C582E1D02F7B826B00C95473 /* Services */,
 				C582E1CD2F7B824000C95473 /* Extensions */,
-				C582E1C22F7B6DEE00C95473 /* Utilities */,
+				C582E1C22F7B6DEE00C95473 /* Utils */,
 				C582E1AD2F7B662700C95473 /* Components */,
 				C582E1AB2F7B660500C95473 /* Views */,
 				C582E1AA2F7B65F700C95473 /* Models */,
@@ -158,8 +186,8 @@
 		C582E1B42F7B677200C95473 /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				C582E1D32F7BA54900C95473 /* Components */,
 				C582E1B62F7B679300C95473 /* HomeView.swift */,
-				C582E1B52F7B677D00C95473 /* ContentView.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -182,11 +210,14 @@
 			path = Detail;
 			sourceTree = "<group>";
 		};
-		C582E1C22F7B6DEE00C95473 /* Utilities */ = {
+		C582E1C22F7B6DEE00C95473 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				C582E1E32F7BBDFD00C95473 /* PreviewData.swift */,
+				C582E1EC2F7BC62700C95473 /* DashboardUtils.swift */,
+				C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */,
 			);
-			path = Utilities;
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		C582E1CD2F7B824000C95473 /* Extensions */ = {
@@ -217,6 +248,49 @@
 				C582E1862F7B655500C95473 /* Assets.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		C582E1D32F7BA54900C95473 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				C5DCF76C2F7BCD7C00428041 /* Carousel */,
+				C582E1E52F7BC50700C95473 /* Dashboard */,
+				C582E1DC2F7BB30F00C95473 /* CurrentReading */,
+				C582E1D42F7BA55800C95473 /* HeaderView.swift */,
+				C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */,
+				C582E1D82F7BA57200C95473 /* DashboardWidget.swift */,
+				C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		C582E1DC2F7BB30F00C95473 /* CurrentReading */ = {
+			isa = PBXGroup;
+			children = (
+				C582E1DD2F7BB34E00C95473 /* HeroBookCard.swift */,
+				C582E1DF2F7BB35C00C95473 /* ReadingProgressCard.swift */,
+				C582E1E12F7BB36800C95473 /* BoomDecorCard.swift */,
+			);
+			path = CurrentReading;
+			sourceTree = "<group>";
+		};
+		C582E1E52F7BC50700C95473 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				C582E1E62F7BC53000C95473 /* CheckInButton.swift */,
+				C582E1EA2F7BC54D00C95473 /* WeeklyEnergyMatrix.swift */,
+				C582E1EE2F7BC64000C95473 /* YearReadingCard.swift */,
+				C582E1F02F7BC65B00C95473 /* MonthReadingCard.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		C5DCF76C2F7BCD7C00428041 /* Carousel */ = {
+			isa = PBXGroup;
+			children = (
+				C5DCF76D2F7BCD8D00428041 /* CarouselCardItem.swift */,
+			);
+			path = Carousel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -364,17 +438,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C582E1ED2F7BC62700C95473 /* DashboardUtils.swift in Sources */,
+				C582E1E42F7BBDFD00C95473 /* PreviewData.swift in Sources */,
+				C582E1F12F7BC65B00C95473 /* MonthReadingCard.swift in Sources */,
+				C582E1D72F7BA56400C95473 /* CurrentReadingWidget.swift in Sources */,
+				C582E1E02F7BB35C00C95473 /* ReadingProgressCard.swift in Sources */,
 				C582E1C52F7B6EFE00C95473 /* HomeView.swift in Sources */,
+				C582E1D92F7BA57200C95473 /* DashboardWidget.swift in Sources */,
 				C582E1CA2F7B6F3400C95473 /* BookDossierView.swift in Sources */,
+				C582E1D52F7BA55800C95473 /* HeaderView.swift in Sources */,
 				C582E1B32F7B66FA00C95473 /* BookCardView.swift in Sources */,
 				C582E1BB2F7B690D00C95473 /* Book.swift in Sources */,
-				C582E1C62F7B6F0400C95473 /* ContentView.swift in Sources */,
+				C582E1DE2F7BB34E00C95473 /* HeroBookCard.swift in Sources */,
+				C582E1DB2F7BA58000C95473 /* CarouselWidget.swift in Sources */,
 				C582E1C72F7B6F2300C95473 /* ArchiveView.swift in Sources */,
+				C582E1EB2F7BC54D00C95473 /* WeeklyEnergyMatrix.swift in Sources */,
 				C582E1B12F7B66CF00C95473 /* View+GlassEffect.swift.swift in Sources */,
 				C582E1BC2F7B692000C95473 /* Excerpt.swift in Sources */,
+				C582E1EF2F7BC64000C95473 /* YearReadingCard.swift in Sources */,
+				C5DCF76E2F7BCD8D00428041 /* CarouselCardItem.swift in Sources */,
 				C582E1C92F7B6F2F00C95473 /* BookDetailView.swift in Sources */,
 				C582E1C82F7B6F2900C95473 /* YearlyTimelineView.swift in Sources */,
+				C582E1E72F7BC53000C95473 /* CheckInButton.swift in Sources */,
 				C582E1CC2F7B77F300C95473 /* LocalCoverView.swift in Sources */,
+				C582E1E22F7BB36800C95473 /* BoomDecorCard.swift in Sources */,
+				C582E1F32F7BC6CC00C95473 /* Color+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

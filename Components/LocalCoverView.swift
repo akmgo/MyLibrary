@@ -22,10 +22,15 @@ struct LocalCoverView: View {
                 #endif
             } else {
                 ZStack {
-                    LinearGradient(colors: [.indigo.opacity(0.4), .purple.opacity(0.6)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    // ✨ 魔法：根据书名生成不同的绝美渐变色
+                    LinearGradient(
+                        colors: fallbackTitle.mockGradientColors,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                     Text(String(fallbackTitle.prefix(1)))
                         .font(.system(size: 40, weight: .black))
-                        .foregroundColor(.white.opacity(0.5))
+                        .foregroundColor(.white.opacity(0.6))
                 }
             }
         }
@@ -33,16 +38,29 @@ struct LocalCoverView: View {
     }
 }
 
-// ✨ 新增：预览缺失图片时的默认排版
-#Preview {
+// ✨ 为 String 添加扩展，根据文字计算固定的渐变色组合
+extension String {
+    var mockGradientColors: [Color] {
+        let hash = abs(self.hashValue)
+        let colorPalettes: [[Color]] = [
+            [.indigo.opacity(0.6), .purple.opacity(0.8)],
+            [.blue.opacity(0.6), .cyan.opacity(0.8)],
+            [.orange.opacity(0.6), .red.opacity(0.8)],
+            [.green.opacity(0.6), .mint.opacity(0.8)],
+            [.pink.opacity(0.6), .orange.opacity(0.8)]
+        ]
+        return colorPalettes[hash % colorPalettes.count]
+    }
+}
+
+#Preview("占位封面测试") {
     HStack(spacing: 20) {
         LocalCoverView(coverData: nil, fallbackTitle: "悉达多")
-            .frame(width: 120, height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            
-        LocalCoverView(coverData: nil, fallbackTitle: "Macbeth")
-            .frame(width: 120, height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .frame(width: 120, height: 180).clipShape(RoundedRectangle(cornerRadius: 12))
+        LocalCoverView(coverData: nil, fallbackTitle: "百年孤独")
+            .frame(width: 120, height: 180).clipShape(RoundedRectangle(cornerRadius: 12))
+        LocalCoverView(coverData: nil, fallbackTitle: "三体")
+            .frame(width: 120, height: 180).clipShape(RoundedRectangle(cornerRadius: 12))
     }
     .padding()
 }
