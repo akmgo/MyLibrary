@@ -1,23 +1,48 @@
-//
-//  Color+Extension.swift
-//  MyLibrary
-//
-//  Created by akram on 2026/3/31.
-//
-
-import Foundation
+// Utils/Color+Extension.swift
 import SwiftUI
 
 extension Color {
-    // ✨ 还原 Tailwind 中的 Emerald 500 (#10b981)
-    static let emerald = Color(red: 16/255, green: 185/255, blue: 129/255)
-    
-    // ✨ 还原 Tailwind 中的 Sky 500 (#0ea5e9) - 用于能量矩阵
-    static let sky = Color(red: 14/255, green: 165/255, blue: 233/255)
-    
-    // ✨ 还原 Tailwind 中的 Fuchsia 500 (#d946ef) - 用于进度条
-    static let fuchsia = Color(red: 217/255, green: 70/255, blue: 239/255)
-    
-    // ✨ 还原 Tailwind 中的 Slate 500 (#64748b) - 用于次要文字
-    static let slate = Color(red: 100/255, green: 116/255, blue: 139/255)
+    // 基础色板
+    static let twSlate50 = Color(red: 248/255, green: 250/255, blue: 252/255)
+    static let twSlate100 = Color(red: 241/255, green: 245/255, blue: 249/255)
+    static let twSlate200 = Color(red: 226/255, green: 232/255, blue: 240/255)
+    static let twSlate300 = Color(red: 203/255, green: 213/255, blue: 225/255)
+    static let twSlate400 = Color(red: 148/255, green: 163/255, blue: 184/255)
+    static let twSlate500 = Color(red: 100/255, green: 116/255, blue: 139/255)
+    static let twSlate600 = Color(red: 71/255, green: 85/255, blue: 105/255)
+    static let twSlate700 = Color(red: 51/255, green: 65/255, blue: 85/255)
+    static let twSlate800 = Color(red: 30/255, green: 41/255, blue: 59/255)
+    static let twSlate900 = Color(red: 15/255, green: 23/255, blue: 42/255)
+    static let twSlate950 = Color(red: 2/255, green: 6/255, blue: 23/255)
+
+    // 主题色板
+    static let twSky300 = Color(red: 125/255, green: 211/255, blue: 252/255)
+    static let twSky400 = Color(red: 56/255, green: 189/255, blue: 248/255)
+    static let twSky500 = Color(red: 14/255, green: 165/255, blue: 233/255)
+    static let twSky600 = Color(red: 2/255, green: 132/255, blue: 199/255)
+    static let twSky700 = Color(red: 3/255, green: 105/255, blue: 161/255)
+
+    static let twEmerald400 = Color(red: 52/255, green: 211/255, blue: 153/255)
+    static let twEmerald500 = Color(red: 16/255, green: 185/255, blue: 129/255)
+
+    static let twFuchsia300 = Color(red: 240/255, green: 171/255, blue: 252/255)
+    static let twFuchsia500 = Color(red: 217/255, green: 70/255, blue: 239/255)
+
+    static let twPurple300 = Color(red: 216/255, green: 180/255, blue: 254/255)
+    static let twPurple600 = Color(red: 147/255, green: 51/255, blue: 234/255)
+
+    static let twIndigo500 = Color(red: 99/255, green: 102/255, blue: 241/255)
+    static let twIndigo600 = Color(red: 79/255, green: 70/255, blue: 229/255)
+
+    static let twBlue300 = Color(red: 147/255, green: 197/255, blue: 253/255)
+    static let twBlue600 = Color(red: 37/255, green: 99/255, blue: 235/255)
+
+    static let twOrange500 = Color(red: 249/255, green: 115/255, blue: 22/255)
+
+    /// ✨ 补上缺失的暖阳光晕颜色
+    static let twAmber200 = Color(red: 253/255, green: 230/255, blue: 138/255)
+
+    // 在主题色板中追加以下颜色：
+    static let twEmerald600 = Color(red: 5/255, green: 150/255, blue: 105/255)
+    static let twIndigo400 = Color(red: 129/255, green: 140/255, blue: 248/255)
 }

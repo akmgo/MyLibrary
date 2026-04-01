@@ -2,29 +2,35 @@ import SwiftUI
 
 struct DashboardWidget: View {
     @State private var hasCheckedIn = false
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
-        VStack(spacing: 25) {
-            // 头部
-            HStack {
-                Text("阅读看板")
-                    .font(.system(size: 26, weight: .black, design: .rounded))
-                Spacer()
-                CheckInButton(hasCheckedIn: $hasCheckedIn)
-            }
+        let isDark = colorScheme == .dark
+        ZStack {
+            GeometryReader { geo in
+                Circle().fill(isDark ? Color.twBlue600.opacity(0.1) : Color.twBlue300.opacity(0.3)).frame(width: 500, height: 500).blur(radius: 100).position(x: 0, y: 0)
+                Circle().fill(isDark ? Color.twPurple600.opacity(0.1) : Color.twPurple300.opacity(0.3)).frame(width: 400, height: 400).blur(radius: 100).position(x: geo.size.width, y: geo.size.height)
+            }.allowsHitTesting(false)
             
-            // 第一排数据卡片
-            HStack(spacing: 20) {
-                YearReadingCard(count: 12)
-                MonthReadingCard(days: 8)
+            VStack(spacing: 24) {
+                HStack {
+                    Text("阅读看板").font(.system(size: 24, weight: .black)).foregroundColor(isDark ? .white : .twSlate800)
+                    Spacer()
+                    CheckInButton(hasCheckedIn: $hasCheckedIn)
+                }
+                .padding(.horizontal, 4)
+                
+                HStack(spacing: 24) {
+                    YearReadingCard(count: 15)
+                    MonthReadingCard(days: 4)
+                }
+                .frame(height: 180)
+                
+                WeeklyEnergyMatrix(continuousDays: 1, weekData: [false, true, false, false, false, false, false]).frame(height: 170)
             }
-            .frame(height: 180)
-            
-            // 第二排能量矩阵
-            WeeklyEnergyMatrix(continuousDays: 3, weekData: [true, true, true, false, false, false, false])
-                .frame(height: 170)
+            .padding(40)
         }
-        .frame(maxWidth: .infinity)
+        .outerGlassBlockStyle()
     }
 }
 

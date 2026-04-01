@@ -63,7 +63,7 @@ struct CarouselCardItem: View {
                 x: 0,
                 y: isCenter ? 20 : 10
             )
-            .matchedGeometryEffect(id: isCenter ? "card-\(book.id)" : "dummy-\(book.id)", in: namespace, isSource: selectedBook?.id != book.id)
+            .matchedGeometryEffect(id: isCenter ? "gallery-\(book.id)" : "dummy-\(book.id)", in: namespace, isSource: selectedBook?.id != book.id)
             
             // ===================================
             // 底部文字区

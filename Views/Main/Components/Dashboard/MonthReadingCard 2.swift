@@ -1,3 +1,11 @@
+//
+//  MonthReadingCard 2.swift
+//  MyLibrary
+//
+//  Created by akram on 2026/4/1.
+//
+
+
 import SwiftUI
 
 struct MonthReadingCard: View {
@@ -37,21 +45,4 @@ struct MonthReadingCard: View {
         .innerGlassCardStyle(isHovered: isHovered)
         .onHover { h in withAnimation(.spring()) { isHovered = h } }
     }
-}
-
-
-#Preview("Light Mode") {
-    MonthReadingCard(days: 15)
-        .frame(width: 280, height: 180)
-        .padding()
-        .preferredColorScheme(.light)
-}
-
-#Preview("Dark Mode") {
-    MonthReadingCard(days: 15)
-        .frame(width: 280, height: 180)
-        .padding()
-        .preferredColorScheme(.dark)
-        .background(Color.black.ignoresSafeArea())
-        
 }

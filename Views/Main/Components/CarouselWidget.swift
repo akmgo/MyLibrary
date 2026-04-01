@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct CarouselWidget: View {
     let books: [Book]
@@ -42,7 +42,6 @@ struct CarouselWidget: View {
                     navButton(icon: "chevron.right") { moveIndex(delta: 1) }
                 }
             }
-            .padding(.horizontal, 40)
             
             // ================= 2. 3D 画廊主体 =================
             ZStack {
@@ -71,10 +70,9 @@ struct CarouselWidget: View {
                     // 悬浮一块与中心卡片大小完全一致的隐形玻璃
                     Rectangle()
                         .fill(Color.black.opacity(0.001)) // 纯透明，但能被 SwiftUI 完美识别
-                        .frame(width: 220, height: 330)   // 精准匹配卡片封面尺寸
-                        .offset(y: -10)                   // 匹配中心卡片上浮偏移
-                        .zIndex(9999)                     // 保证它永远在最上面，不会被任何 3D 卡片遮挡
-                        
+                        .frame(width: 220, height: 330) // 精准匹配卡片封面尺寸
+                        .offset(y: -10) // 匹配中心卡片上浮偏移
+                        .zIndex(9999) // 保证它永远在最上面，不会被任何 3D 卡片遮挡
                         // ✨ 1. 精准控制鼠标变手型
                         .onHover { isHovered in
                             isHoveringCenter = isHovered // 更新全局状态锁
@@ -110,6 +108,13 @@ struct CarouselWidget: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 550)
+            
+            Ellipse()
+                .fill(RadialGradient(colors: [Color.primary.opacity(0.08), .clear], center: .center, startRadius: 50, endRadius: 400))
+                .frame(maxWidth: .infinity) // 舞台也要自适应无限宽
+                .frame(height: 40)
+                .offset(y: -60)
+                .allowsHitTesting(false)
         }
         // ================= 3. 触控板全局安全拦截 =================
         .onAppear {
@@ -139,35 +144,35 @@ struct CarouselWidget: View {
     }
     
     // ===================================
-        // ✨ 精密的触控板防抖与翻页引擎
-        // ===================================
-        #if os(macOS)
-        private func handleScroll(event: NSEvent) {
-            guard !isScrolling else { return } // 防抖锁
+    // ✨ 精密的触控板防抖与翻页引擎
+    // ===================================
+    #if os(macOS)
+    private func handleScroll(event: NSEvent) {
+        guard !isScrolling else { return } // 防抖锁
             
-            // ✨ 优化 1：提高触控板的触发门槛 (从 3.0 提高到 15.0)
-            // 这样可以过滤掉手指的轻微颤抖，必须是有意图的滑动才会触发
-            let threshold: CGFloat = event.hasPreciseScrollingDeltas ? 15.0 : 1.0
-            let deltaX = event.scrollingDeltaX
+        // ✨ 优化 1：提高触控板的触发门槛 (从 3.0 提高到 15.0)
+        // 这样可以过滤掉手指的轻微颤抖，必须是有意图的滑动才会触发
+        let threshold: CGFloat = event.hasPreciseScrollingDeltas ? 15.0 : 1.0
+        let deltaX = event.scrollingDeltaX
             
-            // ✨ 优化 2：方向反转与延长冷却时间
-            if deltaX < -threshold {
-                isScrolling = true
-                // 手指往左划 -> 看下一本 (右边的书)
-                moveIndex(delta: 1)
-                // 冷却时间延长到 0.55 秒，彻底隔绝触控板的“惯性余震”
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) { isScrolling = false }
+        // ✨ 优化 2：方向反转与延长冷却时间
+        if deltaX < -threshold {
+            isScrolling = true
+            // 手指往左划 -> 看下一本 (右边的书)
+            moveIndex(delta: 1)
+            // 冷却时间延长到 0.55 秒，彻底隔绝触控板的“惯性余震”
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) { isScrolling = false }
                 
-            } else if deltaX > threshold {
-                isScrolling = true
-                // 手指往右划 -> 看上一本 (左边的书)
-                moveIndex(delta: -1)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) { isScrolling = false }
-            }
+        } else if deltaX > threshold {
+            isScrolling = true
+            // 手指往右划 -> 看上一本 (左边的书)
+            moveIndex(delta: -1)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) { isScrolling = false }
         }
-        #endif
+    }
+    #endif
     
-    // 无限循环逻辑
+    /// 无限循环逻辑
     private func moveIndex(delta: Int) {
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
             let nextIndex = currentIndex + delta
@@ -181,7 +186,7 @@ struct CarouselWidget: View {
         }
     }
     
-    // 导航按钮
+    /// 导航按钮
     private func navButton(icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: icon)

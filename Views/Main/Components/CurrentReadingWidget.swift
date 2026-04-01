@@ -6,52 +6,44 @@ struct CurrentReadingWidget: View {
     let namespace: Namespace.ID
     @Binding var selectedBook: Book?
     var readingCount: Int = 1
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
+        let isDark = colorScheme == .dark
         ZStack {
-            // ================= 1. 极速光晕背景 =================
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                .fill(Color(NSColor.windowBackgroundColor).opacity(0.6))
-                .background(.ultraThinMaterial)
+            // 光晕放底层
+            GeometryReader { geo in
+                Circle().fill(isDark ? Color.twBlue600.opacity(0.1) : Color.twBlue300.opacity(0.3)).frame(width: 500, height: 500).blur(radius: 100).position(x: 0, y: 0)
+                Circle().fill(isDark ? Color.twPurple600.opacity(0.1) : Color.twPurple300.opacity(0.3)).frame(width: 400, height: 400).blur(radius: 100).position(x: geo.size.width, y: geo.size.height)
+            }.allowsHitTesting(false)
             
-            Circle().fill(Color.blue.opacity(0.15)).frame(width: 400, height: 400).blur(radius: 80).offset(x: -200, y: -150)
-            Circle().fill(Color.purple.opacity(0.15)).frame(width: 300, height: 300).blur(radius: 80).offset(x: 200, y: 150)
-            
-            RoundedRectangle(cornerRadius: 32, style: .continuous)
-                // ✨ 修复 1：将 .clear 改为明确的 Color.clear，以及 Color.white，根除编译器类型推导卡死的隐患
-                .stroke(LinearGradient(colors: [Color.white.opacity(0.5), Color.clear, Color.white.opacity(0.1)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1)
-            
-            // ================= 2. 核心积木拼装 =================
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 HStack {
-                    Text("当前在读").font(.system(size: 24, weight: .bold, design: .rounded)).foregroundColor(.primary)
+                    Text("当前在读").font(.system(size: 24, weight: .black)).foregroundColor(isDark ? .white : .twSlate800)
                     Spacer()
-                    Text("\(readingCount) 本").font(.subheadline).fontWeight(.medium).foregroundColor(.secondary)
+                    Text("\(readingCount) 本").font(.system(size: 14, weight: .bold)).foregroundColor(isDark ? .twSlate300 : .twSlate500)
                 }
+                .padding(.horizontal, 4)
                 
                 if let book = heroBook {
-                    VStack(spacing: 20) {
-                        HStack(spacing: 20) {
-                            HeroBookCard(book: book, namespace: namespace, selectedBook: $selectedBook)
-                                .frame(maxWidth: .infinity)
-                            ReadingProgressCard(book: book)
-                                .frame(width: 240)
+                    VStack(spacing: 24) {
+                        HStack(spacing: 24) {
+                            HeroBookCard(book: book, namespace: namespace, selectedBook: $selectedBook).frame(maxWidth: .infinity)
+                            ReadingProgressCard(book: book).frame(width: 260)
                         }
                         BoomDecorCard()
                     }
                 } else {
                     VStack(spacing: 16) {
-                        Image(systemName: "book.closed").font(.system(size: 48)).foregroundColor(.secondary.opacity(0.3))
-                        Text("目前没有正在阅读的书籍").font(.headline).italic().foregroundColor(.secondary)
+                        Image(systemName: "book.closed").font(.system(size: 48)).foregroundColor(.twSlate400.opacity(0.3))
+                        Text("目前没有正在阅读的书籍").font(.headline).italic().foregroundColor(.twSlate500)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .padding(30)
+            .padding(40)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
-        // ✨ 修复 2：显式声明 Color.black
-        .shadow(color: Color.black.opacity(0.1), radius: 20, x: 0, y: 10)
+        .outerGlassBlockStyle()
     }
 }
 
