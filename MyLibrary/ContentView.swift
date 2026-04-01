@@ -18,6 +18,9 @@ struct ContentView: View {
     @Namespace private var namespace
     @State private var selectedBook: Book? = nil
     
+    // ✨ 精准记录来源的 ID
+    @State private var activeCoverID: String = ""
+    
     @State private var currentMainTab: String = "阅读主页"
     @Namespace private var mainTabNamespace
     
@@ -27,7 +30,6 @@ struct ContentView: View {
         NavigationStack {
             ZStack(alignment: .top) {
                 // ================= 1. 绝对底层：全局统一静止背景 =================
-                // 把它放在 Group 外面，切换 Tab 时它绝对不会闪烁或重绘！
                 ambientBackground
                 
                 // ================= 2. 透明内容层：动态路由 =================
@@ -56,56 +58,53 @@ struct ContentView: View {
                         EmptyView()
                     }
                 }
-                // 内容切换时的淡入淡出动画
                 .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
                 .animation(.easeInOut(duration: 0.4), value: currentMainTab)
                 
                 // ================= 3. 顶层：全局悬浮置顶导航栏 =================
                 globalTopNavBar
+                
+                // ================= 4. ✨ 终极详情页覆盖层 (Hero Animation) =================
+                if let book = selectedBook {
+                    BookDetailView(book: book, namespace: namespace, activeCoverID: activeCoverID, selectedBook: $selectedBook)
+                        .zIndex(100) // 确保在最最最顶层
+                        // ✨ 神级 Hack：利用 0.001 像素的极微小位移，迫使系统在退场时保留详情页 0.6 秒寿命，给封面飞回争取时间！
+                        .transition(.asymmetric(insertion: .identity, removal: .offset(x: 0.001, y: 0)))
+                }
             }
             .navigationTitle("")
             .toolbarBackground(.hidden, for: .windowToolbar)
             .preferredColorScheme(isDarkMode ? .dark : .light)
+            // ✨ 加大加高窗口尺寸，杜绝跳变
+            .frame(width: 1400, height: 950)
         }
     }
     
-    // MARK: - ✨ 拆分：四象限交织光晕引擎
-
+    // MARK: - 拆分：四象限交织光晕引擎
     private var ambientBackground: some View {
         GeometryReader { geo in
             ZStack {
-                (isDarkMode ? Color.twSlate950 : Color.twSlate50)
-                    .ignoresSafeArea()
-
-                // 左上：天蓝
+                (isDarkMode ? Color.twSlate950 : Color.twSlate50).ignoresSafeArea()
                 Circle()
                     .fill(Color.twSky500.opacity(isDarkMode ? 0.25 : 0.18))
                     .frame(width: geo.size.width * 0.7, height: geo.size.width * 0.7)
                     .blur(radius: 130)
                     .offset(x: -geo.size.width * 0.2, y: -geo.size.height * 0.15)
-
-                // 右下：紫红
                 Circle()
                     .fill(Color.twPurple600.opacity(isDarkMode ? 0.25 : 0.15))
                     .frame(width: geo.size.width * 0.7, height: geo.size.width * 0.7)
                     .blur(radius: 130)
                     .offset(x: geo.size.width * 0.5, y: geo.size.height * 0.4)
-
-                // 右上：靛蓝
                 Circle()
                     .fill(Color.twIndigo500.opacity(isDarkMode ? 0.20 : 0.12))
                     .frame(width: geo.size.width * 0.45, height: geo.size.width * 0.45)
                     .blur(radius: 100)
                     .offset(x: geo.size.width * 0.6, y: -geo.size.height * 0.1)
-
-                // 左下：品红
                 Circle()
                     .fill(Color.twFuchsia500.opacity(isDarkMode ? 0.18 : 0.10))
                     .frame(width: geo.size.width * 0.45, height: geo.size.width * 0.45)
                     .blur(radius: 100)
                     .offset(x: -geo.size.width * 0.1, y: geo.size.height * 0.6)
-
-                // 中心：托底防死黑
                 if isDarkMode {
                     Circle()
                         .fill(Color.twIndigo500.opacity(0.12))
@@ -120,18 +119,15 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.7), value: isDarkMode)
     }
     
-    // MARK: - 拆分：置顶悬浮导航条 (已修复绝对居中问题)
-
+    // MARK: - 拆分：置顶悬浮导航条
     private var globalTopNavBar: some View {
-        // ✨ 核心修复：使用 ZStack 让中间的导航栏进行绝对居中，不受左右按钮宽度不一致的影响
         ZStack {
-            // 👆 正中间：核心四字模块切换窗格 (绝对居中层)
             HStack(spacing: 0) {
                 ForEach(mainTabs, id: \.self) { tab in
                     let isActive = currentMainTab == tab
                     let activeTextColor = isDarkMode ? Color.white : Color.twSlate800
                     let inactiveTextColor = isDarkMode ? Color.twSlate400 : Color.twSlate500
-                        
+                    
                     Button(action: {
                         withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { currentMainTab = tab }
                     }) {
@@ -157,11 +153,12 @@ struct ContentView: View {
             .background(isDarkMode ? Color.twSlate800.opacity(0.4) : Color.twSlate200.opacity(0.4))
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(isDarkMode ? Color.twSlate700.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 1))
-                
-            // 👈 左侧与 👉 右侧 功能键 (悬浮层)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(isDarkMode ? Color.twSlate700.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 1)
+            )
+            
             HStack(alignment: .center) {
-                // 左侧：深浅色模式切换
                 Button(action: {
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { isDarkMode.toggle() }
                 }) {
@@ -174,10 +171,9 @@ struct ContentView: View {
                         .overlay(Circle().stroke(Color.primary.opacity(0.1), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
-                    
+                
                 Spacer()
-                    
-                // 右侧：录入新书
+                
                 Button(action: { /* 弹窗录入新书 */ }) {
                     Label("录入新书", systemImage: "plus")
                         .font(.system(size: 14, weight: .bold))
@@ -201,27 +197,26 @@ struct ContentView: View {
                     (isDarkMode ? Color.twSlate950 : Color.twSlate50).opacity(0.9),
                     (isDarkMode ? Color.twSlate950 : Color.twSlate50).opacity(0)
                 ],
-                startPoint: .top,
-                endPoint: .bottom
+                startPoint: .top, endPoint: .bottom
             )
             .ignoresSafeArea(edges: .top)
         )
     }
     
     // MARK: - 拆分：原版阅读主页滚动内容
-
     private var homeScrollContent: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
-                HeaderView()
-                    .padding(.bottom, 20)
+                HeaderView().padding(.bottom, 20)
                 
                 VStack(spacing: sectionSpacing) {
                     HStack(alignment: .top, spacing: widgetSpacing) {
+                        // ✨ 传入 activeCoverID 绑定
                         CurrentReadingWidget(
                             heroBook: readingBooks.first,
                             namespace: namespace,
                             selectedBook: $selectedBook,
+                            activeCoverID: $activeCoverID,
                             readingCount: readingBooks.count
                         )
                         .frame(maxWidth: .infinity, alignment: .top)
@@ -232,7 +227,8 @@ struct ContentView: View {
                     .padding(.bottom, sectionSpacing)
                     
                     if !allBooks.isEmpty {
-                        CarouselWidget(books: allBooks, namespace: namespace, selectedBook: $selectedBook)
+                        // ✨ 暂时不联动 3D 轮播模块，去除参数调用
+                        CarouselWidget(books: allBooks, selectedBook: $selectedBook)
                             .padding(.bottom, 80)
                     }
                 }
@@ -245,11 +241,6 @@ struct ContentView: View {
 }
 
 #Preview("Home View") {
-    struct HomePreviewWrapper: View {
-        @Namespace var namespace; @State var selectedBook: Book?
-        var body: some View {
-            ContentView()
-        }
-    }
-    return HomePreviewWrapper().modelContainer(PreviewData.shared).frame(width: 1440, height: 1200)
+    ContentView()
+        .modelContainer(PreviewData.shared)
 }

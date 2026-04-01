@@ -6,15 +6,15 @@ struct CarouselCardItem: View {
     let index: Int
     let currentIndex: Int
     let totalCount: Int
-    let namespace: Namespace.ID
     let selectedBook: Book?
+    
+    // ✨ 核心修复：彻底删除了这里的 namespace 和 activeCoverID 定义！
     
     // 🎛️ 尺寸对齐网页端
     let cardWidth: CGFloat = 220
     let cardHeight: CGFloat = 330
     
     var body: some View {
-        // ✨ 神级算法复刻：计算最短环形距离
         var diff = index - currentIndex
         let half = totalCount / 2
         
@@ -24,7 +24,6 @@ struct CarouselCardItem: View {
         let absDiff = abs(diff)
         let isCenter = diff == 0
         
-        // 映射为物理变换参数
         let translateX = CGFloat(diff) * 120
         let rotateY = Double(diff) * -35
         let scale = isCenter ? 1.0 : max(1.0 - CGFloat(absDiff) * 0.15, 0.4)
@@ -37,6 +36,7 @@ struct CarouselCardItem: View {
             // ===================================
             ZStack {
                 LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
+                    // ✨ 核心修复：移除了残余的 .matchedGeometryEffect
                 
                 // 黑化遮罩
                 if !isCenter {
@@ -54,7 +54,6 @@ struct CarouselCardItem: View {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .stroke(Color.white.opacity(0.15), lineWidth: 1)
             }
-            // ✨ ✨ ✨ 致命修复：强制约束 ZStack 尺寸！彻底消除无限膨胀的怪异阴影！
             .frame(width: cardWidth, height: cardHeight)
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             .shadow(
@@ -63,7 +62,6 @@ struct CarouselCardItem: View {
                 x: 0,
                 y: isCenter ? 20 : 10
             )
-            .matchedGeometryEffect(id: isCenter ? "gallery-\(book.id)" : "dummy-\(book.id)", in: namespace, isSource: selectedBook?.id != book.id)
             
             // ===================================
             // 底部文字区
@@ -84,7 +82,6 @@ struct CarouselCardItem: View {
             .offset(y: isCenter ? 0 : 20)
             .blur(radius: isCenter ? 0 : 5)
         }
-        // ✨ 尺寸约束后，我们可以安全地将 3D 旋转应用于整个大框架，完美还原网页端质感！
         .rotation3DEffect(.degrees(rotateY), axis: (x: 0, y: 1, z: 0), perspective: 0.8)
         .scaleEffect(scale)
         .offset(x: translateX, y: isCenter ? -10 : 0)

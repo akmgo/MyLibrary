@@ -6,6 +6,8 @@ struct GalleryBookCardView: View {
     let showStatus: Bool
     let isFinishedTab: Bool
     
+    // ✨ 核心修复：彻底删除了这里的 namespace 定义！
+    
     @Environment(\.colorScheme) var colorScheme
     @State private var isHovered = false
     @State private var isPulsing = false
@@ -28,6 +30,7 @@ struct GalleryBookCardView: View {
                 .overlay(
                     ZStack(alignment: .topTrailing) {
                         LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
+                            // ✨ 核心修复：移除了残余的 .matchedGeometryEffect
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .clipped()
                         
@@ -35,7 +38,6 @@ struct GalleryBookCardView: View {
                         
                         if showStatus {
                             StatusPill(status: book.status, isPulsing: isPulsing)
-                                // ✨ 优化：增加右侧间距，使其向左偏移，彻底防止被卡片的 16px 圆角裁剪
                                 .padding(.top, 5)
                                 .padding(.trailing, 25)
                         }
@@ -49,7 +51,6 @@ struct GalleryBookCardView: View {
             
             // ================= 2. 文本信息区 =================
             VStack(alignment: .leading, spacing: 4) {
-                // ✨ 优化：去掉 .black，改用 .bold 粗体，视觉更舒适
                 Text(book.title).font(.system(size: 16, weight: .bold)).foregroundColor(titleColor).lineLimit(1)
                 Text(book.author).font(.system(size: 13, weight: .bold)).foregroundColor(authorColor).lineLimit(1)
                 
@@ -139,7 +140,6 @@ struct StatusPill: View {
     
     var body: some View {
         let isDark = colorScheme == .dark
-        // ✨ 优化：严格遵守双字规则
         let label = status == "FINISHED" ? "已读" : (status == "READING" ? "在读" : "待读")
         let dotColor = status == "FINISHED" ? Color.twEmerald500 : (status == "READING" ? Color.twIndigo500 : Color.twSlate400)
         let textColor = status == "FINISHED" ? (isDark ? Color.twEmerald400 : Color.twEmerald600) : (status == "READING" ? (isDark ? Color.twIndigo400 : Color.twIndigo600) : (isDark ? Color.twSlate300 : Color.twSlate600))
