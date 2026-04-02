@@ -180,22 +180,12 @@ struct ContentView: View {
                 
                 Spacer()
                 
-                Button(action: {
-                    // ✨ 核心修复：给按钮通电，触发弹窗！
+                // 👉 右侧：录入新书按钮 (替换为动画组件)
+                HomeAddBookButton {
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
                         showAddModal = true
                     }
-                }) {
-                    Label("录入新书", systemImage: "plus")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(LinearGradient(colors: [.indigo, .purple], startPoint: .leading, endPoint: .trailing))
-                        .clipShape(Capsule())
-                        .shadow(color: .indigo.opacity(0.3), radius: 8, y: 4)
                 }
-                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, pagePadding)

@@ -17,7 +17,7 @@ final class Book {
     var startTime: Date?
     var endTime: Date?
     
-    @Relationship(deleteRule: .cascade) var excerpts: [Excerpt]?
+    @Relationship(deleteRule: .cascade) var excerpts: [Excerpt]? = []
     
     init(id: String = UUID().uuidString,
          title: String,

@@ -35,7 +35,7 @@ struct HeroBookCard: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             // 3. ✨ 黄金法则：挂载引擎
                             .matchedGeometryEffect(id: "hero-\(book.id)", in: namespace)
-                            .frame(width: 110, height: 160)
+                            .frame(width: 150, height: 200)
                             // 4. 3D 旋转等形变必须放在引擎之后，否则起飞会扭曲！
                             .rotation3DEffect(.degrees(isHovered ? 12 : 0), axis: (x: 0, y: 1, z: -0.2), perspective: 0.5)
                             .offset(y: isHovered ? -8 : 0)

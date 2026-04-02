@@ -53,7 +53,7 @@ struct CurrentReadingWidget: View {
                             .frame(maxWidth: .infinity)
                             
                             ReadingProgressCard(book: book)
-                                .frame(width: 260)
+                                .frame(width: 200)
                         }
                         BoomDecorCard()
                     }

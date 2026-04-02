@@ -8,11 +8,16 @@ struct BookExcerptsView: View {
     
     @State private var showAddExcerpt = false
     
-    /// 模拟数据
-    let mockExcerpts = [
-        "在这个世界上，除了死亡和税收之外，没有什么是确定无疑的。但这并不妨碍我们去追求那些虚无缥缈的浪漫与理想。",
-        "读书，是一场随身携带的避难所。无论外界多么喧嚣，只要翻开书页，就能拥有一片绝对宁静的属于自己的领地。"
-    ]
+    /// ✨ 帮编译器分步处理，彻底解决类型推断报错
+    private var sortedExcerpts: [Excerpt] {
+        // 第一步：先拿到摘录数组，如果是 nil 就给个空数组
+        let list = book.excerpts ?? []
+            
+        // 第二步：明确告诉编译器使用 `by:` 闭包，并显式声明 a 和 b 的类型
+        return list.sorted(by: { (a: Excerpt, b: Excerpt) in
+            a.createdAt > b.createdAt
+        })
+    }
     
     var body: some View {
         let isDark = colorScheme == .dark
@@ -27,20 +32,10 @@ struct BookExcerptsView: View {
                     
                     Spacer()
                     
-                    // 添加摘录按钮
-                    Button(action: { showAddExcerpt = true }) {
-                        HStack {
-                            Image(systemName: "plus").font(.system(size: 14, weight: .bold))
-                            Text("添加摘录").font(.system(size: 14, weight: .bold))
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .frame(height: 40)
-                        .background(LinearGradient(colors: [.twIndigo500, .twPurple600], startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .clipShape(Capsule())
-                        .shadow(color: Color.twIndigo500.opacity(0.4), radius: 8, y: 4)
+                    // 添加摘录按钮 (替换为薄荷绿弹跳组件)
+                    DetailAddExcerptButton {
+                        showAddExcerpt = true
                     }
-                    .buttonStyle(.plain)
                 }
                 
                 // 标题底部的分割线 (对应 border-b border-slate-200)
@@ -48,7 +43,7 @@ struct BookExcerptsView: View {
             }
             
             // ================= 2. 书摘流列表 =================
-            if mockExcerpts.isEmpty {
+            if sortedExcerpts.isEmpty {
                 // 空状态：虚线框提示区
                 VStack(spacing: 12) {
                     Text("这本书还没有留下任何思考的痕迹")
@@ -68,23 +63,29 @@ struct BookExcerptsView: View {
                 // 瀑布流双列布局 (对应网页端的 columns-1 md:columns-2)
                 let columns = [GridItem(.adaptive(minimum: 350), spacing: 24)]
                 LazyVGrid(columns: columns, spacing: 24) {
-                    ForEach(mockExcerpts, id: \.self) { text in
-                        ExcerptCardView(text: text, date: "2024-03-21")
+                    ForEach(sortedExcerpts, id: \.id) { excerpt in
+                        ExcerptCardView(content: excerpt.content, createdAt: formatDate(excerpt.createdAt))
                     }
                 }
             }
         }
         .padding(.top, 20)
         .sheet(isPresented: $showAddExcerpt) {
-            AddExcerptSheet()
+            AddExcerptSheet(book: book)
         }
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter.string(from: date)
     }
 }
 
 /// ✨ 单条书摘卡片组件：独立的毛玻璃材质，独自悬浮
 struct ExcerptCardView: View {
-    let text: String
-    let date: String
+    let content: String
+    let createdAt: String
     @Environment(\.colorScheme) var colorScheme
     @State private var isHovered = false
     
@@ -111,7 +112,7 @@ struct ExcerptCardView: View {
                         .offset(x: -10, y: -20)
                     
                     // 摘录正文
-                    Text(text)
+                    Text(content)
                         .font(.system(size: 18, weight: .regular, design: .serif))
                         .foregroundColor(isDark ? .twSlate200 : .twSlate700)
                         .lineSpacing(10)
@@ -121,7 +122,7 @@ struct ExcerptCardView: View {
                 
                 HStack {
                     Spacer()
-                    Text("—— 记录于 \(date)")
+                    Text("—— 记录于 \(createdAt)")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(isDark ? .twSlate500 : .twSlate400)
                 }

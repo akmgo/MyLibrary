@@ -1,17 +1,22 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
+import UniformTypeIdentifiers
 
 struct BookEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.modelContext) private var modelContext
     
-    // 判断是新增还是编辑
+    /// 判断是新增还是编辑
     var bookToEdit: Book? = nil
     
     @State private var titleInput: String = ""
     @State private var authorInput: String = ""
     
-    // 模拟是否有封面图片
+    @State private var selectedCoverData: Data? = nil
+    @State private var isShowingImagePicker = false
+    
+    /// 模拟是否有封面图片
     @State private var hasCover: Bool = false
     
     var body: some View {
@@ -48,7 +53,6 @@ struct BookEditorSheet: View {
             
             // ================= 2. 中间表单与封面区 =================
             HStack(alignment: .top, spacing: 40) {
-                
                 // 👉 左侧：输入表单区
                 VStack(alignment: .leading, spacing: 24) {
                     // 书名输入
@@ -93,23 +97,55 @@ struct BookEditorSheet: View {
                             .font(.system(size: 12, weight: .bold))
                             .foregroundColor(.twIndigo500)
                     }
-                    
-                    if isEdit {
-                        // 编辑模式：显示已有封面 (暂用占位色块模拟截图效果)
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color(hex: "F3DEB3")) // 模拟截图里的牛皮纸颜色
-                            .frame(width: 160, height: 240)
-                            .overlay(
-                                Text("毛\n泽\n东\n选\n集")
-                                    .font(.system(size: 24, weight: .black, design: .serif))
-                                    .foregroundColor(.black.opacity(0.8))
-                                    .padding(.trailing, 20)
-                            )
-                            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black.opacity(0.05), lineWidth: 1))
-                            .shadow(color: .black.opacity(0.1), radius: 10, y: 5)
-                    } else {
-                        // 新增模式：虚线拖拽区
-                        DashedDropzoneView(isDark: isDark)
+                                    
+                    // ✨ 将整个封面区变成一个大按钮
+                    Button(action: {
+                        isShowingImagePicker = true
+                    }) {
+                        if let data = selectedCoverData {
+                            // ✨ 状态 A：有图了！直接调用你的 LocalCoverView 渲染
+                            LocalCoverView(coverData: data, fallbackTitle: titleInput.isEmpty ? "暂无书名" : titleInput)
+                                .frame(width: 160, height: 240)
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black.opacity(0.05), lineWidth: 1))
+                                .shadow(color: .black.opacity(0.1), radius: 10, y: 5)
+                        } else {
+                            // ✨ 状态 B：没图，显示虚线框
+                            DashedDropzoneView(isDark: isDark)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    // ✨ 核心 1：点击弹出文件选择器 (跨平台支持)
+                    .fileImporter(
+                        isPresented: $isShowingImagePicker,
+                        allowedContentTypes: [.image],
+                        allowsMultipleSelection: false
+                    ) { result in
+                        do {
+                            guard let selectedFile: URL = try result.get().first else { return }
+                            // 请求安全访问权限 (macOS 沙盒机制必需)
+                            if selectedFile.startAccessingSecurityScopedResource() {
+                                defer { selectedFile.stopAccessingSecurityScopedResource() }
+                                let data = try Data(contentsOf: selectedFile)
+                                selectedCoverData = data // 赋值给界面！
+                            }
+                        } catch {
+                            print("读取图片失败: \(error)")
+                        }
+                    }
+                    // ✨ 核心 2：支持直接从桌面拖拽图片进来！
+                    .onDrop(of: [UTType.image], isTargeted: nil) { providers in
+                        if let provider = providers.first {
+                            provider.loadDataRepresentation(forTypeIdentifier: UTType.image.identifier) { data, _ in
+                                if let data = data {
+                                    DispatchQueue.main.async {
+                                        self.selectedCoverData = data // 赋值给界面！
+                                    }
+                                }
+                            }
+                            return true
+                        }
+                        return false
                     }
                 }
                 .frame(width: 160)
@@ -120,38 +156,33 @@ struct BookEditorSheet: View {
             
             // ================= 3. 底部 Footer =================
             HStack {
-                Button(action: { dismiss() }) {
-                    Text("取消")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(isDark ? .twSlate300 : .twSlate600)
-                        .frame(width: 80, height: 44)
-                        .background(isDark ? Color.twSlate800 : .white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(isDark ? Color.twSlate700 : Color.twSlate200, lineWidth: 1))
+                // 👉 1. 替换为动效取消按钮
+                HoverCancelButton(isDark: isDark) {
+                    dismiss()
                 }
-                .buttonStyle(.plain)
-                
+                            
                 Spacer()
                 
-                Button(action: { /* 保存逻辑预留 */ }) {
-                    HStack(spacing: 6) {
-                        if !isEdit {
-                            Image(systemName: "plus")
-                        }
-                        Text(isEdit ? "保存修改" : "确认录入")
-                    }
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(isEdit ? .twSlate400 : .white)
-                    .frame(width: 120, height: 44)
-                    .background(
-                        isEdit
-                        ? (isDark ? Color.twSlate800 : Color.twSlate100)
-                        : Color.twIndigo600
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                // ✨ 1. 基本校验：不能为空
+                let isFormEmpty = titleInput.trimmingCharacters(in: .whitespaces).isEmpty || authorInput.trimmingCharacters(in: .whitespaces).isEmpty
+                                
+                // ✨ 2. 脏数据校验：是否和数据库里的原数据有差异？
+                let hasChanges = bookToEdit == nil ? true : (
+                    titleInput != bookToEdit?.title ||
+                        authorInput != bookToEdit?.author ||
+                        selectedCoverData != bookToEdit?.coverData
+                )
+                            
+                // ✨ 3. 终极判断：要么是空的，要么没修改，都会被封印！
+                let shouldDisable = isFormEmpty || !hasChanges
+                            
+                EditorSubmitButton(
+                    isEdit: isEdit,
+                    isDisabled: shouldDisable, // ✨ 完美修复：由输入框内容决定是否可点击！
+                    isDark: isDark
+                ) {
+                    saveBook()
                 }
-                .buttonStyle(.plain)
-                .disabled(isEdit) // 截图里编辑状态按钮置灰
             }
             .padding(.horizontal, 32)
             .padding(.top, 24)
@@ -166,8 +197,26 @@ struct BookEditorSheet: View {
             if let book = bookToEdit {
                 titleInput = book.title
                 authorInput = book.author
+                selectedCoverData = book.coverData // ✨ 载入已有封面！
             }
         }
+    }
+    
+    private func saveBook() {
+        guard !titleInput.isEmpty, !authorInput.isEmpty else { return }
+            
+        if let book = bookToEdit {
+            book.title = titleInput
+            book.author = authorInput
+            book.coverData = selectedCoverData // ✨ 保存新封面！
+        } else {
+            let newBook = Book(title: titleInput, author: authorInput, status: "UNREAD", tags: [])
+            newBook.coverData = selectedCoverData // ✨ 保存新封面！
+            modelContext.insert(newBook)
+        }
+            
+        try? modelContext.save()
+        dismiss()
     }
 }
 
@@ -268,7 +317,7 @@ struct DashedDropzoneView: View {
     }
 }
 
-// 辅助色扩展，用于模拟截图里的纯色
+/// 辅助色扩展，用于模拟截图里的纯色
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -289,7 +338,7 @@ extension Color {
             .sRGB,
             red: Double(r) / 255,
             green: Double(g) / 255,
-            blue:  Double(b) / 255,
+            blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
     }

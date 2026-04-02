@@ -37,40 +37,18 @@ struct BookDetailView: View {
                 VStack(alignment: .leading, spacing: 40) {
                     HStack {
                         // 左侧：返回按钮
-                        Button(action: { closeDetail() }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "arrow.left").font(.system(size: 16, weight: .bold))
-                                Text("返回书架").font(.system(size: 15, weight: .bold))
-                            }
-                            .foregroundColor(isDarkMode ? .twSlate300 : .twSlate600)
-                            .padding(.horizontal, 20).padding(.vertical, 12)
-                            .background(isDarkMode ? Color.twSlate800.opacity(0.6) : Color.white.opacity(0.6))
-                            .background(.ultraThinMaterial)
-                            .clipShape(Capsule())
-                            .overlay(Capsule().stroke(isDarkMode ? Color.white.opacity(0.05) : Color.white.opacity(0.6), lineWidth: 1))
-                            .shadow(color: .black.opacity(isDarkMode ? 0.2 : 0.05), radius: 10, y: 4)
+                        // 左侧：返回按钮 (替换为动画组件)
+                        HoverBackButton(isDark: isDarkMode) {
+                            closeDetail()
                         }
-                        .buttonStyle(.plain)
                                             
                         Spacer() // ✨ 把左右两边推开！
                                             
                         // 右侧：编辑和删除操作区
+                        // 右侧：编辑和删除操作区 (替换为动画组件)
                         HStack(spacing: 12) {
-                            Button(action: { showEditSheet = true }) {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "pencil")
-                                    Text("编辑")
-                                }
-                            }
-                            .buttonStyle(DetailActionButtonStyle(isDark: isDarkMode, role: .edit))
-                                                
-                            Button(action: { showDeleteAlert = true }) {
-                                HStack(spacing: 6) {
-                                    Image(systemName: "trash")
-                                    Text("删除")
-                                }
-                            }
-                            .buttonStyle(DetailActionButtonStyle(isDark: isDarkMode, role: .delete))
+                            HoverEditButton(isDark: isDarkMode) { showEditSheet = true }
+                            HoverDeleteButton(isDark: isDarkMode) { showDeleteAlert = true }
                         }
                     }
                     .opacity(showContent ? 1 : 0)
@@ -126,25 +104,6 @@ struct BookDetailView: View {
                 selectedBook = nil
             }
         }
-    }
-}
-
-struct DetailActionButtonStyle: ButtonStyle {
-    var isDark: Bool
-    var role: Role
-    enum Role { case edit, delete }
-    
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 14, weight: .bold))
-            .foregroundColor(role == .delete ? .red : (isDark ? .twSlate300 : .twSlate600))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(isDark ? Color.twSlate800.opacity(0.6) : Color.white.opacity(0.6))
-            .background(.ultraThinMaterial)
-            .clipShape(Capsule())
-            .overlay(Capsule().stroke(role == .delete ? Color.red.opacity(0.3) : (isDark ? Color.white.opacity(0.05) : Color.white.opacity(0.6)), lineWidth: 1))
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 

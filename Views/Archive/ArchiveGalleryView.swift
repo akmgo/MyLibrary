@@ -13,7 +13,7 @@ struct ArchiveGalleryView: View {
     @Namespace private var tabNamespace
     
     let tabs: [(String, String)] = [("UNREAD", "待读"), ("ALL", "全部"), ("FINISHED", "已读")]
-    let horizontalSpacing: CGFloat = 32
+    let horizontalSpacing: CGFloat = 20
     let verticalSpacing: CGFloat = 40
     let topSpacing: CGFloat = 170
     

@@ -12,13 +12,13 @@ import SwiftData
 final class Excerpt {
     @Attribute(.unique) var id: String
     var content: String
-    var pageOrChapter: String
     var createdAt: Date
     
-    init(id: String = UUID().uuidString, content: String, pageOrChapter: String = "", createdAt: Date = Date()) {
+    var book: Book?
+    
+    init(id: String = UUID().uuidString, content: String, createdAt: Date = Date()) {
         self.id = id
         self.content = content
-        self.pageOrChapter = pageOrChapter
         self.createdAt = createdAt
     }
 }
