@@ -17,6 +17,9 @@ struct BookDetailView: View {
     @State private var showEditSheet = false
     @State private var showDeleteAlert = false
     
+    /// ✨ 新增：把摘录弹窗的控制权提到详情页这一层，确保它能覆盖全屏
+    @State private var showAddExcerptSheet = false
+    
     var body: some View {
         ZStack {
             // ================= 1. 瞬间覆盖的背景层 =================
@@ -30,24 +33,18 @@ struct BookDetailView: View {
                 }.ignoresSafeArea()
             }
             .opacity(showBackground ? 1 : 0)
-            .zIndex(0) // ✨ 背景最底层
+            .zIndex(0)
             
             // ================= 2. 延迟出现的文本与内容层 =================
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 40) {
                     HStack {
-                        // 左侧：返回按钮
-                        // 左侧：返回按钮 (替换为动画组件)
-                        HoverBackButton(isDark: isDarkMode) {
-                            closeDetail()
-                        }
-                                            
-                        Spacer() // ✨ 把左右两边推开！
-                                            
-                        // 右侧：编辑和删除操作区
-                        // 右侧：编辑和删除操作区 (替换为动画组件)
+                        HoverBackButton(isDark: isDarkMode) { closeDetail() }
+                        Spacer()
                         HStack(spacing: 12) {
-                            HoverEditButton(isDark: isDarkMode) { showEditSheet = true }
+                            HoverEditButton(isDark: isDarkMode) {
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showEditSheet = true }
+                            }
                             HoverDeleteButton(isDark: isDarkMode) { showDeleteAlert = true }
                         }
                     }
@@ -57,37 +54,76 @@ struct BookDetailView: View {
                     
                     VStack(spacing: 40) {
                         BookDossierView(book: book, namespace: namespace, activeCoverID: activeCoverID, showContent: showContent)
-                            .zIndex(999) // ✨
+                            .zIndex(999)
                         
-                        BookExcerptsView(book: book)
+                        // ✨ 传入控制开关
+                        BookExcerptsView(book: book, showAddExcerpt: $showAddExcerptSheet)
                             .opacity(showContent ? 1 : 0)
                             .offset(y: showContent ? 0 : 20)
-                            .zIndex(0) // ✨ 摘录区必定在下层
+                            .zIndex(0)
                     }
-                    .zIndex(999) // ✨
+                    .zIndex(999)
                 }
                 .padding(40)
-                .zIndex(999) // ✨
+                .zIndex(999)
             }
-            .zIndex(999) // ✨ 保证整个 ScrollView 能够容纳起飞元素
+            .zIndex(999)
+            
+            // ================= 3. ✨ 编辑书籍弹窗引擎 =================
+            if showEditSheet {
+                ZStack(alignment: .center) {
+                    Color.black.opacity(isDarkMode ? 0.5 : 0.2)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showEditSheet = false }
+                        }
+                        .transition(.opacity)
+                        .zIndex(1)
+                    
+                    BookEditorSheet(isPresented: $showEditSheet, bookToEdit: book)
+                        .transition(.asymmetric(
+                            insertion: .scale(scale: 0.9).combined(with: .opacity),
+                            removal: .scale(scale: 0.9).combined(with: .opacity)
+                        ))
+                        .zIndex(2)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .zIndex(1000) // ✨ 盖在所有内容之上
+            }
+            
+            // ================= 4. ✨ 新增摘录弹窗引擎 =================
+            if showAddExcerptSheet {
+                ZStack(alignment: .center) {
+                    Color.black.opacity(isDarkMode ? 0.5 : 0.2)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showAddExcerptSheet = false }
+                        }
+                        .transition(.opacity)
+                        .zIndex(1)
+                    
+                    AddExcerptSheet(isPresented: $showAddExcerptSheet, book: book)
+                        .transition(.asymmetric(
+                            insertion: .scale(scale: 0.9).combined(with: .opacity),
+                            removal: .scale(scale: 0.9).combined(with: .opacity)
+                        ))
+                        .zIndex(2)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .zIndex(1001) // ✨ 盖在所有内容之上
+            }
+            
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
             withAnimation(.easeOut(duration: 0.15)) { showBackground = true }
             withAnimation(.easeOut(duration: 0.3).delay(0.2)) { showContent = true }
         }
-        .sheet(isPresented: $showEditSheet) {
-            BookEditorSheet(bookToEdit: book) // 传参：编辑模式
-        }
         .alert("删除书籍", isPresented: $showDeleteAlert) {
             Button("取消", role: .cancel) {}
             Button("确认删除", role: .destructive) {
-                // 先触发飞回动画关闭详情页
                 closeDetail()
-                // 延迟一小下再删数据，防止动画找不到数据源崩溃
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    modelContext.delete(book)
-                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { modelContext.delete(book) }
             }
         } message: {
             Text("确定要删除《\(book.title)》吗？相关的读书笔记也会一并清除。")
@@ -96,17 +132,12 @@ struct BookDetailView: View {
     
     private func closeDetail() {
         withAnimation(.easeOut(duration: 0.15)) { showContent = false }
-            
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             withAnimation(.easeOut(duration: 0.2)) { showBackground = false }
-                
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                selectedBook = nil
-            }
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { selectedBook = nil }
         }
     }
 }
-
 /// 预览 Wrapper
 struct BookDetailPreviewWrapper: View {
     let book: Book

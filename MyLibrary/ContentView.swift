@@ -26,13 +26,19 @@ struct ContentView: View {
     @State private var currentMainTab: String = "阅读主页"
     @Namespace private var mainTabNamespace
     
-    let mainTabs = ["阅读主页", "全景画廊", "年度轨迹", "月度记录"]
+    /// ✨ Apple Music 风格：带图标的导航数据源
+    let mainTabs = [
+        ("阅读主页", "house.fill"),
+        ("全景画廊", "square.grid.2x2.fill"),
+        ("年度轨迹", "timelapse"),
+        ("月度记录", "calendar")
+    ]
     
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
                 // ================= 1. 绝对底层：全局统一静止背景 =================
-                ambientBackground
+                FluidBackgroundView(isDark: isDarkMode)
                 
                 // ================= 2. 透明内容层：动态路由 =================
                 Group {
@@ -70,142 +76,109 @@ struct ContentView: View {
                 if let book = selectedBook {
                     BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook)
                         .zIndex(100) // 确保在最最最顶层
-                        // ✨ 神级 Hack：利用 0.001 像素的极微小位移，迫使系统在退场时保留详情页 0.6 秒寿命，给封面飞回争取时间！
                         .transition(.asymmetric(insertion: .identity, removal: .offset(x: 0.001, y: 0)))
+                }
+                
+                // ================= 5. ✨ 主页：录入新书弹窗引擎 =================
+                if showAddModal {
+                    // 👉 使用新的绝对居中全屏容器
+                    ZStack(alignment: .center) {
+                        Color.black.opacity(isDarkMode ? 0.5 : 0.2)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showAddModal = false }
+                            }
+                            .transition(.opacity)
+                            .zIndex(1)
+                        
+                        BookEditorSheet(isPresented: $showAddModal, bookToEdit: nil)
+                            .transition(.asymmetric(
+                                insertion: .scale(scale: 0.9).combined(with: .opacity),
+                                removal: .scale(scale: 0.9).combined(with: .opacity)
+                            ))
+                            .zIndex(2)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity) // ✨ 撑满全屏，无视外层的 alignment: .top
+                    .zIndex(101)
                 }
             }
             .navigationTitle("")
             .toolbarBackground(.hidden, for: .windowToolbar)
             .preferredColorScheme(isDarkMode ? .dark : .light)
-            .sheet(isPresented: $showAddModal) {
-                BookEditorSheet()
-            }
+            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: showAddModal)
         }
         .frame(width: 1400, height: 1000)
     }
     
-    // MARK: - 拆分：四象限交织光晕引擎
-
-    private var ambientBackground: some View {
-        GeometryReader { geo in
-            ZStack {
-                (isDarkMode ? Color.twSlate950 : Color.twSlate50).ignoresSafeArea()
-                Circle()
-                    .fill(Color.twSky500.opacity(isDarkMode ? 0.25 : 0.18))
-                    .frame(width: geo.size.width * 0.7, height: geo.size.width * 0.7)
-                    .blur(radius: 130)
-                    .offset(x: -geo.size.width * 0.2, y: -geo.size.height * 0.15)
-                Circle()
-                    .fill(Color.twPurple600.opacity(isDarkMode ? 0.25 : 0.15))
-                    .frame(width: geo.size.width * 0.7, height: geo.size.width * 0.7)
-                    .blur(radius: 130)
-                    .offset(x: geo.size.width * 0.5, y: geo.size.height * 0.4)
-                Circle()
-                    .fill(Color.twIndigo500.opacity(isDarkMode ? 0.20 : 0.12))
-                    .frame(width: geo.size.width * 0.45, height: geo.size.width * 0.45)
-                    .blur(radius: 100)
-                    .offset(x: geo.size.width * 0.6, y: -geo.size.height * 0.1)
-                Circle()
-                    .fill(Color.twFuchsia500.opacity(isDarkMode ? 0.18 : 0.10))
-                    .frame(width: geo.size.width * 0.45, height: geo.size.width * 0.45)
-                    .blur(radius: 100)
-                    .offset(x: -geo.size.width * 0.1, y: geo.size.height * 0.6)
-                if isDarkMode {
-                    Circle()
-                        .fill(Color.twIndigo500.opacity(0.12))
-                        .frame(width: geo.size.width * 0.5, height: geo.size.width * 0.5)
-                        .blur(radius: 150)
-                        .position(x: geo.size.width / 2, y: geo.size.height / 2)
-                }
-            }
-        }
-        .ignoresSafeArea()
-        .allowsHitTesting(false)
-        .animation(.easeInOut(duration: 0.7), value: isDarkMode)
-    }
-    
     // MARK: - 拆分：置顶悬浮导航条
-
     private var globalTopNavBar: some View {
         ZStack {
             HStack(spacing: 0) {
-                ForEach(mainTabs, id: \.self) { tab in
-                    let isActive = currentMainTab == tab
-                    let activeTextColor = isDarkMode ? Color.white : Color.twSlate800
+                ForEach(mainTabs, id: \.0) { tab in
+                    let title = tab.0
+                    let icon = tab.1
+                    let isActive = currentMainTab == title
+                    
+                    let activeTextColor = isDarkMode ? Color.white : Color.twSlate900
                     let inactiveTextColor = isDarkMode ? Color.twSlate400 : Color.twSlate500
                     
                     Button(action: {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { currentMainTab = tab }
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0.2)) {
+                            currentMainTab = title
+                        }
                     }) {
                         ZStack {
                             if isActive {
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(isDarkMode ? Color.twSlate700 : .white)
-                                    .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
+                                Capsule()
+                                    .fill(isDarkMode ? Color.white.opacity(0.15) : Color.black.opacity(0.08))
                                     .matchedGeometryEffect(id: "main-nav-tab", in: mainTabNamespace)
                             }
-                            Text(tab)
-                                .font(.system(size: 15, weight: .bold))
-                                .foregroundColor(isActive ? activeTextColor : inactiveTextColor)
+                            HStack(spacing: 6) {
+                                Image(systemName: icon)
+                                    .font(.system(size: 15, weight: isActive ? .bold : .medium))
+                                    .scaleEffect(isActive ? 1.05 : 1.0)
+                                Text(title)
+                                    .font(.system(size: 14, weight: .bold))
+                            }
+                            .foregroundColor(isActive ? activeTextColor : inactiveTextColor)
+                            .shadow(color: .black.opacity(isActive && isDarkMode ? 0.3 : 0), radius: 2, y: 1)
                         }
                         .frame(height: 44)
                         .frame(maxWidth: .infinity)
+                        .contentShape(Capsule())
                     }
                     .buttonStyle(.plain)
                 }
             }
             .padding(6)
-            .frame(width: 520)
-            .background(isDarkMode ? Color.twSlate800.opacity(0.4) : Color.twSlate200.opacity(0.4))
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(isDarkMode ? Color.twSlate700.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 1)
-            )
+            .frame(width: 580)
+            .liquidGlass(cornerRadius: 100, isDark: isDarkMode)
             
             HStack(alignment: .center) {
                 Button(action: {
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { isDarkMode.toggle() }
                 }) {
                     Image(systemName: isDarkMode ? "moon.stars.fill" : "sun.max.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(isDarkMode ? .indigo : .orange)
-                        .frame(width: 44, height: 44)
-                        .background(Color.primary.opacity(0.05))
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color.primary.opacity(0.1), lineWidth: 1))
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(isDarkMode ? .twSky400 : .orange)
+                        .frame(width: 50, height: 50)
+                        .liquidGlass(cornerRadius: 25, isDark: isDarkMode)
                 }
                 .buttonStyle(.plain)
                 
                 Spacer()
                 
-                // 👉 右侧：录入新书按钮 (替换为动画组件)
                 HomeAddBookButton {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                        showAddModal = true
-                    }
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { showAddModal = true }
                 }
             }
         }
         .padding(.horizontal, pagePadding)
         .padding(.top, 20)
         .padding(.bottom, 24)
-        .background(
-            LinearGradient(
-                colors: [
-                    isDarkMode ? Color.twSlate950 : Color.twSlate50,
-                    (isDarkMode ? Color.twSlate950 : Color.twSlate50).opacity(0.9),
-                    (isDarkMode ? Color.twSlate950 : Color.twSlate50).opacity(0)
-                ],
-                startPoint: .top, endPoint: .bottom
-            )
-            .ignoresSafeArea(edges: .top)
-        )
     }
     
     // MARK: - 拆分：原版阅读主页滚动内容
-
     private var homeScrollContent: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
@@ -213,7 +186,6 @@ struct ContentView: View {
                 
                 VStack(spacing: sectionSpacing) {
                     HStack(alignment: .top, spacing: widgetSpacing) {
-                        // ✨ 传入 activeCoverID 绑定
                         CurrentReadingWidget(
                             heroBook: readingBooks.first,
                             namespace: namespace,
@@ -229,7 +201,6 @@ struct ContentView: View {
                     .padding(.bottom, sectionSpacing)
                     
                     if !allBooks.isEmpty {
-                        // ✨ 暂时不联动 3D 轮播模块，去除参数调用
                         CarouselWidget(books: allBooks)
                             .padding(.bottom, 80)
                     }
@@ -237,8 +208,9 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity)
             }
             .padding(.horizontal, pagePadding)
-            .padding(.top, topSpacing)
+            .padding(.top, 120)
         }
+        .ignoresSafeArea(edges: .top)
     }
 }
 

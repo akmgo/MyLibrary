@@ -11,6 +11,11 @@
 		C53E9E2F2F7E4D370022A698 /* BookEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */; };
 		C53E9E312F7E5B2B0022A698 /* AddExcerptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */; };
 		C53E9E332F7E81C30022A698 /* AnimatedButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E322F7E81C30022A698 /* AnimatedButtons.swift */; };
+		C53E9E352F7E89EE0022A698 /* LiquidGlassModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E342F7E89EE0022A698 /* LiquidGlassModifier.swift */; };
+		C53E9E372F7E8B930022A698 /* FluidBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E362F7E8B930022A698 /* FluidBackgroundView.swift */; };
+		C53E9E392F7EA0860022A698 /* LiquidButtonModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E382F7EA0860022A698 /* LiquidButtonModifier.swift */; };
+		C53E9E3D2F7EAD9B0022A698 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E3C2F7EAD9B0022A698 /* CustomTextField.swift */; };
+		C53E9E3F2F7EAF640022A698 /* LiquidSheetModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E3E2F7EAF640022A698 /* LiquidSheetModifier.swift */; };
 		C582E1872F7B655500C95473 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C582E1862F7B655500C95473 /* Assets.xcassets */; };
 		C582E1B12F7B66CF00C95473 /* View+GlassEffect.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B02F7B66CF00C95473 /* View+GlassEffect.swift.swift */; };
 		C582E1B32F7B66FA00C95473 /* BookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B22F7B66FA00C95473 /* BookCardView.swift */; };
@@ -61,6 +66,11 @@
 		C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookEditorSheet.swift; sourceTree = "<group>"; };
 		C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExcerptSheet.swift; sourceTree = "<group>"; };
 		C53E9E322F7E81C30022A698 /* AnimatedButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedButtons.swift; sourceTree = "<group>"; };
+		C53E9E342F7E89EE0022A698 /* LiquidGlassModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlassModifier.swift; sourceTree = "<group>"; };
+		C53E9E362F7E8B930022A698 /* FluidBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidBackgroundView.swift; sourceTree = "<group>"; };
+		C53E9E382F7EA0860022A698 /* LiquidButtonModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidButtonModifier.swift; sourceTree = "<group>"; };
+		C53E9E3C2F7EAD9B0022A698 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
+		C53E9E3E2F7EAF640022A698 /* LiquidSheetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidSheetModifier.swift; sourceTree = "<group>"; };
 		C582E17D2F7B655400C95473 /* MyLibrary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyLibrary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C582E1862F7B655500C95473 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C582E18C2F7B655500C95473 /* MyLibraryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyLibraryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -228,6 +238,11 @@
 				C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */,
 				C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */,
 				C53E9E322F7E81C30022A698 /* AnimatedButtons.swift */,
+				C53E9E342F7E89EE0022A698 /* LiquidGlassModifier.swift */,
+				C53E9E362F7E8B930022A698 /* FluidBackgroundView.swift */,
+				C53E9E382F7EA0860022A698 /* LiquidButtonModifier.swift */,
+				C53E9E3C2F7EAD9B0022A698 /* CustomTextField.swift */,
+				C53E9E3E2F7EAF640022A698 /* LiquidSheetModifier.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -452,10 +467,14 @@
 			files = (
 				C582E1E42F7BBDFD00C95473 /* PreviewData.swift in Sources */,
 				C582E1F12F7BC65B00C95473 /* MonthReadingCard.swift in Sources */,
+				C53E9E392F7EA0860022A698 /* LiquidButtonModifier.swift in Sources */,
+				C53E9E3F2F7EAF640022A698 /* LiquidSheetModifier.swift in Sources */,
 				C582E1D72F7BA56400C95473 /* CurrentReadingWidget.swift in Sources */,
 				C582E1E02F7BB35C00C95473 /* ReadingProgressCard.swift in Sources */,
 				C5DCF7702F7C1D1E00428041 /* View+GlassStyle.swift in Sources */,
+				C53E9E352F7E89EE0022A698 /* LiquidGlassModifier.swift in Sources */,
 				C582E1D92F7BA57200C95473 /* DashboardWidget.swift in Sources */,
+				C53E9E3D2F7EAD9B0022A698 /* CustomTextField.swift in Sources */,
 				C582E1CA2F7B6F3400C95473 /* BookDossierView.swift in Sources */,
 				C582E1D52F7BA55800C95473 /* HeaderView.swift in Sources */,
 				C582E1B32F7B66FA00C95473 /* BookCardView.swift in Sources */,
@@ -469,6 +488,7 @@
 				C582E1B12F7B66CF00C95473 /* View+GlassEffect.swift.swift in Sources */,
 				C582E1BC2F7B692000C95473 /* Excerpt.swift in Sources */,
 				C582E1EF2F7BC64000C95473 /* YearReadingCard.swift in Sources */,
+				C53E9E372F7E8B930022A698 /* FluidBackgroundView.swift in Sources */,
 				C53E9E312F7E5B2B0022A698 /* AddExcerptSheet.swift in Sources */,
 				C53E9E332F7E81C30022A698 /* AnimatedButtons.swift in Sources */,
 				C5DCF76E2F7BCD8D00428041 /* CarouselCardItem.swift in Sources */,

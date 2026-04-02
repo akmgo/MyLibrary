@@ -52,4 +52,10 @@ extension Color {
     static let twIndigo800 = Color(hex: "3730A3")
     static let twIndigo900 = Color(hex: "312E81")
     static let twIndigo950 = Color(hex: "1E1B4B")
+
+    // ✨ 补齐 Apple Music 流体引擎需要的色阶
+    static let twPurple500 = Color(hex: "a855f7")
+    static let twFuchsia400 = Color(hex: "e879f9")
+
+    static let twPurple400 = Color(hex: "c084fc")
 }
