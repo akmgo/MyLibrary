@@ -1,0 +1,313 @@
+import SwiftUI
+import SwiftData
+
+struct BookEditorSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    
+    // 判断是新增还是编辑
+    var bookToEdit: Book? = nil
+    
+    @State private var titleInput: String = ""
+    @State private var authorInput: String = ""
+    
+    // 模拟是否有封面图片
+    @State private var hasCover: Bool = false
+    
+    var body: some View {
+        let isDark = colorScheme == .dark
+        let isEdit = bookToEdit != nil
+        
+        VStack(spacing: 0) {
+            // ================= 1. 顶部 Header =================
+            HStack(alignment: .center) {
+                HStack(spacing: 12) {
+                    Image(systemName: isEdit ? "book.closed.fill" : "plus.square.dashed")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.twIndigo600)
+                    
+                    Text(isEdit ? "编辑档案" : "添置新书")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(isDark ? .white : .twSlate800)
+                }
+                
+                Spacer()
+                
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.twSlate400)
+                        .padding(8)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 32)
+            .padding(.top, 32)
+            .padding(.bottom, 24)
+            
+            // ================= 2. 中间表单与封面区 =================
+            HStack(alignment: .top, spacing: 40) {
+                
+                // 👉 左侧：输入表单区
+                VStack(alignment: .leading, spacing: 24) {
+                    // 书名输入
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("书名")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.twSlate400)
+                        
+                        CustomTextField(
+                            placeholder: "例如：活着",
+                            text: $titleInput,
+                            icon: "magnifyingglass",
+                            isDark: isDark
+                        )
+                    }
+                    Spacer()
+                    
+                    // Metadata 分割线
+                    MetadataDivider(isDark: isDark)
+                    
+                    // 作者输入
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("作者")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.twSlate400)
+                        
+                        CustomTextField(
+                            placeholder: "例如：余华",
+                            text: $authorInput,
+                            icon: nil,
+                            isDark: isDark
+                        )
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                
+                // 👉 右侧：封面上传区
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Spacer()
+                        Label("实体封面图", systemImage: "photo")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.twIndigo500)
+                    }
+                    
+                    if isEdit {
+                        // 编辑模式：显示已有封面 (暂用占位色块模拟截图效果)
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color(hex: "F3DEB3")) // 模拟截图里的牛皮纸颜色
+                            .frame(width: 160, height: 240)
+                            .overlay(
+                                Text("毛\n泽\n东\n选\n集")
+                                    .font(.system(size: 24, weight: .black, design: .serif))
+                                    .foregroundColor(.black.opacity(0.8))
+                                    .padding(.trailing, 20)
+                            )
+                            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.black.opacity(0.05), lineWidth: 1))
+                            .shadow(color: .black.opacity(0.1), radius: 10, y: 5)
+                    } else {
+                        // 新增模式：虚线拖拽区
+                        DashedDropzoneView(isDark: isDark)
+                    }
+                }
+                .frame(width: 160)
+            }
+            .padding(.horizontal, 32)
+            
+            Spacer()
+            
+            // ================= 3. 底部 Footer =================
+            HStack {
+                Button(action: { dismiss() }) {
+                    Text("取消")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(isDark ? .twSlate300 : .twSlate600)
+                        .frame(width: 80, height: 44)
+                        .background(isDark ? Color.twSlate800 : .white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(isDark ? Color.twSlate700 : Color.twSlate200, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                Button(action: { /* 保存逻辑预留 */ }) {
+                    HStack(spacing: 6) {
+                        if !isEdit {
+                            Image(systemName: "plus")
+                        }
+                        Text(isEdit ? "保存修改" : "确认录入")
+                    }
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(isEdit ? .twSlate400 : .white)
+                    .frame(width: 120, height: 44)
+                    .background(
+                        isEdit
+                        ? (isDark ? Color.twSlate800 : Color.twSlate100)
+                        : Color.twIndigo600
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+                .disabled(isEdit) // 截图里编辑状态按钮置灰
+            }
+            .padding(.horizontal, 32)
+            .padding(.top, 24)
+            .padding(.bottom, 32)
+        }
+        .frame(width: 600, height: 420)
+        .background(isDark ? Color.twSlate900 : .white)
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .shadow(color: .black.opacity(isDark ? 0.3 : 0.08), radius: 30, y: 15)
+        .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(isDark ? Color.white.opacity(0.1) : Color.black.opacity(0.05), lineWidth: 1))
+        .onAppear {
+            if let book = bookToEdit {
+                titleInput = book.title
+                authorInput = book.author
+            }
+        }
+    }
+}
+
+// MARK: - 自定义子组件
+
+/// 自定义圆角输入框
+struct CustomTextField: View {
+    var placeholder: String
+    @Binding var text: String
+    var icon: String?
+    var isDark: Bool
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            TextField(placeholder, text: $text)
+                .textFieldStyle(.plain)
+                .font(.system(size: 15))
+                .foregroundColor(isDark ? .white : .twSlate800)
+            
+            if let icon = icon {
+                Image(systemName: icon)
+                    .foregroundColor(.twSlate400)
+                    .font(.system(size: 16, weight: .medium))
+            }
+        }
+        .padding(.horizontal, 16)
+        .frame(height: 48)
+        .background(isDark ? Color.twSlate950 : Color.twSlate50) // 极浅的底色
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(isDark ? Color.twSlate800 : Color.twSlate200, lineWidth: 1)
+        )
+    }
+}
+
+/// 中间的 Metadata 分割线
+struct MetadataDivider: View {
+    var isDark: Bool
+    var body: some View {
+        HStack(spacing: 16) {
+            Rectangle()
+                .fill(isDark ? Color.twSlate800 : Color.twSlate200)
+                .frame(height: 1)
+            
+            HStack(spacing: 6) {
+                Circle().fill(Color.twIndigo400).frame(width: 6, height: 6)
+                Text("METADATA")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .tracking(2)
+                    .foregroundColor(.twSlate500)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
+            .background(isDark ? Color.twSlate800 : .white)
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(isDark ? Color.twSlate700 : Color.twSlate200, lineWidth: 1))
+            .shadow(color: .black.opacity(isDark ? 0.2 : 0.02), radius: 4, y: 2)
+            
+            Rectangle()
+                .fill(isDark ? Color.twSlate800 : Color.twSlate200)
+                .frame(height: 1)
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+/// 虚线拖拽上传区
+struct DashedDropzoneView: View {
+    var isDark: Bool
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(
+                    isDark ? Color.twIndigo500.opacity(0.4) : Color.twIndigo400.opacity(0.5),
+                    style: StrokeStyle(lineWidth: 1.5, dash: [6, 6])
+                )
+                .background(isDark ? Color.twIndigo900.opacity(0.1) : Color.twIndigo50.opacity(0.3))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+            
+            VStack(spacing: 12) {
+                Image(systemName: "icloud.and.arrow.up")
+                    .font(.system(size: 32, weight: .light))
+                    .foregroundColor(.twIndigo400)
+                
+                VStack(spacing: 4) {
+                    Text("点击或拖拽")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.twIndigo500)
+                    Text("比例 2:3")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.twIndigo400.opacity(0.8))
+                }
+            }
+        }
+        .frame(width: 160, height: 240)
+    }
+}
+
+// 辅助色扩展，用于模拟截图里的纯色
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (1, 1, 1, 0)
+        }
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue:  Double(b) / 255,
+            opacity: Double(a) / 255
+        )
+    }
+}
+
+// ===============================================
+// ✨ 独立预览环境
+// ===============================================
+#Preview("Add Book Modal (Light)") {
+    ZStack {
+        Color.twSlate100.ignoresSafeArea()
+        BookEditorSheet(bookToEdit: nil)
+    }
+}
+
+#Preview("Edit Book Modal (Light)") {
+    ZStack {
+        Color.twSlate100.ignoresSafeArea()
+        BookEditorSheet(bookToEdit: Book(title: "毛泽东选集", author: "毛泽东", status: "UNREAD", tags: []))
+    }
+}

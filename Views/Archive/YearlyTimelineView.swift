@@ -1,11 +1,19 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct YearlyTimelineView: View {
     let books: [Book]
+    
+    // ✨ 1. 接收动画引擎和状态绑定
+    let namespace: Namespace.ID
+    @Binding var selectedBook: Book?
+    @Binding var activeCoverID: String
+    
     @Environment(\.colorScheme) var colorScheme
     
-    private var currentYearNum: Int { Calendar.current.component(.year, from: Date()) }
+    private var currentYearNum: Int {
+        Calendar.current.component(.year, from: Date())
+    }
     
     private var yearlyBooks: [Book] {
         books.filter { book in
@@ -14,7 +22,6 @@ struct YearlyTimelineView: View {
         }.sorted { ($0.endTime ?? Date.distantPast) > ($1.endTime ?? Date.distantPast) }
     }
     
-    // ✨ 新增：顶部间距控制变量 (调整这个数值就能控制时间线距离导航栏有多远)
     let topSpacing: CGFloat = 170
     
     var body: some View {
@@ -22,8 +29,6 @@ struct YearlyTimelineView: View {
         
         ScrollView {
             VStack(spacing: 0) {
-                // 🚨 原有的 "阅读轨迹" 和 "几本书" 的文字 HStack 已经被彻底删除
-                
                 if yearlyBooks.isEmpty {
                     VStack(spacing: 16) {
                         Image(systemName: "calendar.badge.exclamationmark").font(.system(size: 64)).foregroundColor(isDark ? .twSlate600 : .twSlate400).opacity(0.5)
@@ -36,14 +41,21 @@ struct YearlyTimelineView: View {
                         
                         VStack(spacing: 80) {
                             ForEach(Array(yearlyBooks.enumerated()), id: \.element.id) { index, book in
-                                TimelineRowView(book: book, isLeft: index % 2 == 0)
+                                TimelineRowView(
+                                    book: book,
+                                    isLeft: index % 2 == 0,
+                                    namespace: namespace,
+                                    selectedBook: $selectedBook,
+                                    activeCoverID: $activeCoverID
+                                )
+                                // ✨ 红毯层级 1：提升选中卡片在 VStack 中的渲染层级
+                                .zIndex(selectedBook?.id == book.id ? 999 : 0)
                             }
                         }.padding(.vertical, 40)
                     }
                 }
             }
             .padding(.horizontal, 40)
-            // ✨ 将间距控制变量注入在这里
             .padding(.top, topSpacing)
             .padding(.bottom, 60)
         }
@@ -51,9 +63,15 @@ struct YearlyTimelineView: View {
 }
 
 // MARK: - 独立的时间线单行视图
+
 struct TimelineRowView: View {
     let book: Book
     let isLeft: Bool
+    
+    // ✨ 2. 接收参数并继续下传
+    let namespace: Namespace.ID
+    @Binding var selectedBook: Book?
+    @Binding var activeCoverID: String
     
     @Environment(\.colorScheme) var colorScheme
     @State private var isHovered = false
@@ -72,7 +90,7 @@ struct TimelineRowView: View {
             // ================= 左侧区域 =================
             Group {
                 if isLeft {
-                    TimelineCardView(book: book, isCardOnLeft: true, isDark: isDark, isHovered: $isHovered)
+                    TimelineCardView(book: book, isCardOnLeft: true, isDark: isDark, isHovered: $isHovered, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
                         .padding(.trailing, 60)
                 } else {
                     TimelineDateView(dateStr: dateStr, rating: book.rating, isLeft: true, isDark: isDark, isHovered: isHovered)
@@ -99,16 +117,19 @@ struct TimelineRowView: View {
                     TimelineDateView(dateStr: dateStr, rating: book.rating, isLeft: false, isDark: isDark, isHovered: isHovered)
                         .padding(.leading, 60)
                 } else {
-                    TimelineCardView(book: book, isCardOnLeft: false, isDark: isDark, isHovered: $isHovered)
+                    TimelineCardView(book: book, isCardOnLeft: false, isDark: isDark, isHovered: $isHovered, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
                         .padding(.leading, 60)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+        // ✨ 红毯层级 2：保证左右两侧谁被选中，整行都置顶
+        .zIndex(selectedBook?.id == book.id ? 999 : 0)
     }
 }
 
 // MARK: - 日期显示区
+
 struct TimelineDateView: View {
     let dateStr: String
     let rating: Int
@@ -119,7 +140,6 @@ struct TimelineDateView: View {
     var body: some View {
         VStack(alignment: isLeft ? .trailing : .leading, spacing: 8) {
             Text(dateStr)
-                // ✨ 优化 2：日期字体由 .black 降为 .bold
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .tracking(2)
                 .foregroundColor(isHovered ? .twIndigo500 : (isDark ? .twSlate500 : .twSlate400))
@@ -141,11 +161,17 @@ struct TimelineDateView: View {
 }
 
 // MARK: - 3D 悬浮书籍卡片
+
 struct TimelineCardView: View {
     let book: Book
     let isCardOnLeft: Bool
     let isDark: Bool
     @Binding var isHovered: Bool
+    
+    // ✨ 3. 接收最终的控制参数
+    let namespace: Namespace.ID
+    @Binding var selectedBook: Book?
+    @Binding var activeCoverID: String
     
     var body: some View {
         HStack(spacing: 24) {
@@ -209,27 +235,60 @@ struct TimelineCardView: View {
         .offset(y: isHovered ? -8 : 0)
         .contentShape(Rectangle())
         .onHover { h in withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) { isHovered = h } }
+        // ✨ 4. 加入手势起飞逻辑
+        .onTapGesture {
+            activeCoverID = "timeline-\(book.id)"
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                selectedBook = book
+            }
+        }
+        // ✨ 红毯层级 3：确保被点击的卡片在这对 HStack 中置顶
+        .zIndex(selectedBook?.id == book.id ? 999 : 0)
     }
     
-    // MARK: - 图片模块
-    @ViewBuilder
+    // MARK: - 图片模块 (✨ 黄金法则重构)
+
     private var coverSection: some View {
-        Color.clear
-            .aspectRatio(2.0 / 3.0, contentMode: .fit)
-            .overlay(LocalCoverView(coverData: book.coverData, fallbackTitle: book.title).frame(maxWidth: .infinity, maxHeight: .infinity).clipped())
-            .frame(width: 110)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isDark ? Color.white.opacity(0.1) : Color.black.opacity(0.05), lineWidth: 1))
-            .shadow(color: Color.twIndigo500.opacity(isHovered ? 0.3 : 0.0), radius: isHovered ? 15 : 0, y: isHovered ? 10 : 0)
-            .scaleEffect(isHovered ? 1.05 : 1.0)
+        ZStack {
+            if selectedBook?.id != book.id {
+                // 👉 状态 A：没被选中时
+                Color.clear
+                    .overlay(LocalCoverView(coverData: book.coverData, fallbackTitle: book.title))
+                    // 1. 切圆角
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    // 2. ✨ 把外面的边框挪进来！作为“纹身”紧紧贴在封面上！
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(isDark ? Color.white.opacity(0.1) : Color.black.opacity(0.05), lineWidth: 1)
+                    )
+                    // 3. 挂载引擎，带着纹身一起飞走！
+                    .matchedGeometryEffect(id: "timeline-\(book.id)", in: namespace)
+                    // 4. 定死硬尺寸
+                    .frame(width: 110, height: 165)
+            } else {
+                // 👉 状态 B：彻底纯净的空气墙
+                Color.clear
+                    .frame(width: 110, height: 165)
+            }
+        }
+        // ✨ 将原本在这里的 .overlay(stroke) 彻底删除！
+        // ✨ 阴影也受选中状态控制：一旦起飞，原地的阴影彻底消失（透明度变 0）
+        .shadow(
+            color: Color.twIndigo500.opacity(selectedBook?.id == book.id ? 0 : (isHovered ? 0.3 : 0.0)),
+            radius: isHovered ? 15 : 0,
+            y: isHovered ? 10 : 0
+        )
+        // ✨ 悬浮放大同理：起飞后原地不放大
+        .scaleEffect(isHovered && selectedBook?.id != book.id ? 1.05 : 1.0)
+        // ✨ 红毯层级 4：确保封面在文字上方起飞
+        .zIndex(selectedBook?.id == book.id ? 999 : 0)
     }
     
     // MARK: - 文本模块
-    @ViewBuilder
+
     private var textSection: some View {
         VStack(alignment: isCardOnLeft ? .trailing : .leading, spacing: 8) {
             Text(book.title)
-                // ✨ 优化 3：书名由 .black 降为 .bold
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(isHovered ? .twIndigo500 : (isDark ? .white : .twSlate800))
                 .lineLimit(2)
@@ -243,7 +302,7 @@ struct TimelineCardView: View {
             
             if book.rating > 0 {
                 HStack(spacing: 4) {
-                    ForEach(1...5, id: \.self) { i in
+                    ForEach(1 ... 5, id: \.self) { i in
                         Image(systemName: "star.fill")
                             .font(.system(size: 12))
                             .foregroundColor(i <= book.rating ? .yellow : (isDark ? .twSlate700 : .twSlate200))
@@ -254,21 +313,30 @@ struct TimelineCardView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: isCardOnLeft ? .trailing : .leading)
+        .zIndex(0)
     }
 }
 
 // ===============================================
-// ✨ 独立预览环境
+// ✨ 独立预览环境注入
 // ===============================================
 #Preview("Light Mode - Yearly Timeline") {
-    YearlyTimelineView(books: PreviewData.allMockBooks)
+    @Previewable @Namespace var ns
+    @Previewable @State var selectedBook: Book? = nil
+    @Previewable @State var activeCoverID = ""
+    
+    YearlyTimelineView(books: PreviewData.allMockBooks, namespace: ns, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
         .frame(width: 1200, height: 900)
         .preferredColorScheme(.light)
         .modelContainer(PreviewData.shared)
 }
 
 #Preview("Dark Mode - Yearly Timeline") {
-    YearlyTimelineView(books: PreviewData.allMockBooks)
+    @Previewable @Namespace var ns
+    @Previewable @State var selectedBook: Book? = nil
+    @Previewable @State var activeCoverID = ""
+    
+    YearlyTimelineView(books: PreviewData.allMockBooks, namespace: ns, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
         .frame(width: 1200, height: 900)
         .preferredColorScheme(.dark)
         .modelContainer(PreviewData.shared)

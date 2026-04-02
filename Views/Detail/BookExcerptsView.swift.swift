@@ -1,12 +1,14 @@
 // Views/Detail/BookExcerptsView.swift
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct BookExcerptsView: View {
     let book: Book
     @Environment(\.colorScheme) var colorScheme
     
-    // 模拟数据
+    @State private var showAddExcerpt = false
+    
+    /// 模拟数据
     let mockExcerpts = [
         "在这个世界上，除了死亡和税收之外，没有什么是确定无疑的。但这并不妨碍我们去追求那些虚无缥缈的浪漫与理想。",
         "读书，是一场随身携带的避难所。无论外界多么喧嚣，只要翻开书页，就能拥有一片绝对宁静的属于自己的领地。"
@@ -14,11 +16,8 @@ struct BookExcerptsView: View {
     
     var body: some View {
         let isDark = colorScheme == .dark
-        
-        // ✨ 移除了外层的 ZStack 和 .outerGlassBlockStyle()
         // 现在摘录模块直接渲染在页面的全局背景上
         VStack(alignment: .leading, spacing: 30) {
-            
             // ================= 1. 顶部标题栏 =================
             VStack(spacing: 16) {
                 HStack(alignment: .center) {
@@ -29,7 +28,7 @@ struct BookExcerptsView: View {
                     Spacer()
                     
                     // 添加摘录按钮
-                    Button(action: { /* 触发添加书摘弹窗 */ }) {
+                    Button(action: { showAddExcerpt = true }) {
                         HStack {
                             Image(systemName: "plus").font(.system(size: 14, weight: .bold))
                             Text("添加摘录").font(.system(size: 14, weight: .bold))
@@ -76,10 +75,13 @@ struct BookExcerptsView: View {
             }
         }
         .padding(.top, 20)
+        .sheet(isPresented: $showAddExcerpt) {
+            AddExcerptSheet()
+        }
     }
 }
 
-// ✨ 单条书摘卡片组件：独立的毛玻璃材质，独自悬浮
+/// ✨ 单条书摘卡片组件：独立的毛玻璃材质，独自悬浮
 struct ExcerptCardView: View {
     let text: String
     let date: String

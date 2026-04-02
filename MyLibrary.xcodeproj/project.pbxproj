@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C53E9DCF2F7D01770022A698 /* GalleryBookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9DCE2F7D01770022A698 /* GalleryBookCardView.swift */; };
+		C53E9E2F2F7E4D370022A698 /* BookEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */; };
+		C53E9E312F7E5B2B0022A698 /* AddExcerptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */; };
 		C582E1872F7B655500C95473 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C582E1862F7B655500C95473 /* Assets.xcassets */; };
 		C582E1B12F7B66CF00C95473 /* View+GlassEffect.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B02F7B66CF00C95473 /* View+GlassEffect.swift.swift */; };
 		C582E1B32F7B66FA00C95473 /* BookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B22F7B66FA00C95473 /* BookCardView.swift */; };
@@ -55,6 +57,8 @@
 
 /* Begin PBXFileReference section */
 		C53E9DCE2F7D01770022A698 /* GalleryBookCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryBookCardView.swift; sourceTree = "<group>"; };
+		C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookEditorSheet.swift; sourceTree = "<group>"; };
+		C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExcerptSheet.swift; sourceTree = "<group>"; };
 		C582E17D2F7B655400C95473 /* MyLibrary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyLibrary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C582E1862F7B655500C95473 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C582E18C2F7B655500C95473 /* MyLibraryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyLibraryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,6 +223,8 @@
 				C582E1E32F7BBDFD00C95473 /* PreviewData.swift */,
 				C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */,
 				C5DCF76F2F7C1D1E00428041 /* View+GlassStyle.swift */,
+				C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */,
+				C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -460,11 +466,13 @@
 				C582E1B12F7B66CF00C95473 /* View+GlassEffect.swift.swift in Sources */,
 				C582E1BC2F7B692000C95473 /* Excerpt.swift in Sources */,
 				C582E1EF2F7BC64000C95473 /* YearReadingCard.swift in Sources */,
+				C53E9E312F7E5B2B0022A698 /* AddExcerptSheet.swift in Sources */,
 				C5DCF76E2F7BCD8D00428041 /* CarouselCardItem.swift in Sources */,
 				C582E1C92F7B6F2F00C95473 /* BookDetailView.swift in Sources */,
 				C582E1C82F7B6F2900C95473 /* YearlyTimelineView.swift in Sources */,
 				C582E1E72F7BC53000C95473 /* CheckInButton.swift in Sources */,
 				C582E1CC2F7B77F300C95473 /* LocalCoverView.swift in Sources */,
+				C53E9E2F2F7E4D370022A698 /* BookEditorSheet.swift in Sources */,
 				C582E1E22F7BB36800C95473 /* BoomDecorCard.swift in Sources */,
 				C582E1F32F7BC6CC00C95473 /* Color+Extension.swift in Sources */,
 			);

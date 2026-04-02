@@ -31,9 +31,6 @@ extension Color {
     static let twPurple300 = Color(red: 216/255, green: 180/255, blue: 254/255)
     static let twPurple600 = Color(red: 147/255, green: 51/255, blue: 234/255)
 
-    static let twIndigo500 = Color(red: 99/255, green: 102/255, blue: 241/255)
-    static let twIndigo600 = Color(red: 79/255, green: 70/255, blue: 229/255)
-
     static let twBlue300 = Color(red: 147/255, green: 197/255, blue: 253/255)
     static let twBlue600 = Color(red: 37/255, green: 99/255, blue: 235/255)
 
@@ -44,5 +41,15 @@ extension Color {
 
     // 在主题色板中追加以下颜色：
     static let twEmerald600 = Color(red: 5/255, green: 150/255, blue: 105/255)
-    static let twIndigo400 = Color(red: 129/255, green: 140/255, blue: 248/255)
+    static let twIndigo50 = Color(hex: "EEF2FF")
+    static let twIndigo100 = Color(hex: "E0E7FF")
+    static let twIndigo200 = Color(hex: "C7D2FE")
+    static let twIndigo300 = Color(hex: "A5B4FC")
+    static let twIndigo400 = Color(hex: "818CF8")
+    static let twIndigo500 = Color(hex: "6366F1")
+    static let twIndigo600 = Color(hex: "4F46E5")
+    static let twIndigo700 = Color(hex: "4338CA")
+    static let twIndigo800 = Color(hex: "3730A3")
+    static let twIndigo900 = Color(hex: "312E81")
+    static let twIndigo950 = Color(hex: "1E1B4B")
 }

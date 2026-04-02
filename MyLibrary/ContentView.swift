@@ -21,6 +21,8 @@ struct ContentView: View {
     /// ✨ 精准记录来源的 ID
     @State private var activeCoverID: String = ""
     
+    @State private var showAddModal = false
+    
     @State private var currentMainTab: String = "阅读主页"
     @Namespace private var mainTabNamespace
     
@@ -40,7 +42,7 @@ struct ContentView: View {
                     case "全景画廊":
                         ArchiveGalleryView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
                     case "年度轨迹":
-                        YearlyTimelineView(books: allBooks)
+                        YearlyTimelineView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
                     case "月度记录":
                         VStack {
                             Spacer()
@@ -75,9 +77,11 @@ struct ContentView: View {
             .navigationTitle("")
             .toolbarBackground(.hidden, for: .windowToolbar)
             .preferredColorScheme(isDarkMode ? .dark : .light)
-            // ✨ 加大加高窗口尺寸，杜绝跳变
-            .frame(width: 1400, height: 950)
+            .sheet(isPresented: $showAddModal) {
+                BookEditorSheet()
+            }
         }
+        .frame(width: 1400, height: 1000)
     }
     
     // MARK: - 拆分：四象限交织光晕引擎
@@ -176,7 +180,12 @@ struct ContentView: View {
                 
                 Spacer()
                 
-                Button(action: { /* 弹窗录入新书 */ }) {
+                Button(action: {
+                    // ✨ 核心修复：给按钮通电，触发弹窗！
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        showAddModal = true
+                    }
+                }) {
                     Label("录入新书", systemImage: "plus")
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.white)
