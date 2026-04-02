@@ -18,7 +18,7 @@ struct ContentView: View {
     @Namespace private var namespace
     @State private var selectedBook: Book? = nil
     
-    // ✨ 精准记录来源的 ID
+    /// ✨ 精准记录来源的 ID
     @State private var activeCoverID: String = ""
     
     @State private var currentMainTab: String = "阅读主页"
@@ -38,7 +38,7 @@ struct ContentView: View {
                     case "阅读主页":
                         homeScrollContent
                     case "全景画廊":
-                        ArchiveGalleryView(books: allBooks, selectedBook: $selectedBook)
+                        ArchiveGalleryView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
                     case "年度轨迹":
                         YearlyTimelineView(books: allBooks)
                     case "月度记录":
@@ -66,7 +66,7 @@ struct ContentView: View {
                 
                 // ================= 4. ✨ 终极详情页覆盖层 (Hero Animation) =================
                 if let book = selectedBook {
-                    BookDetailView(book: book, namespace: namespace, activeCoverID: activeCoverID, selectedBook: $selectedBook)
+                    BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook)
                         .zIndex(100) // 确保在最最最顶层
                         // ✨ 神级 Hack：利用 0.001 像素的极微小位移，迫使系统在退场时保留详情页 0.6 秒寿命，给封面飞回争取时间！
                         .transition(.asymmetric(insertion: .identity, removal: .offset(x: 0.001, y: 0)))
@@ -81,6 +81,7 @@ struct ContentView: View {
     }
     
     // MARK: - 拆分：四象限交织光晕引擎
+
     private var ambientBackground: some View {
         GeometryReader { geo in
             ZStack {
@@ -120,6 +121,7 @@ struct ContentView: View {
     }
     
     // MARK: - 拆分：置顶悬浮导航条
+
     private var globalTopNavBar: some View {
         ZStack {
             HStack(spacing: 0) {
@@ -204,6 +206,7 @@ struct ContentView: View {
     }
     
     // MARK: - 拆分：原版阅读主页滚动内容
+
     private var homeScrollContent: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
@@ -228,7 +231,7 @@ struct ContentView: View {
                     
                     if !allBooks.isEmpty {
                         // ✨ 暂时不联动 3D 轮播模块，去除参数调用
-                        CarouselWidget(books: allBooks, selectedBook: $selectedBook)
+                        CarouselWidget(books: allBooks)
                             .padding(.bottom, 80)
                     }
                 }

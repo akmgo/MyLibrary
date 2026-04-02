@@ -1,14 +1,13 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct CarouselCardItem: View {
     let book: Book
     let index: Int
     let currentIndex: Int
     let totalCount: Int
-    let selectedBook: Book?
     
-    // ✨ 核心修复：彻底删除了这里的 namespace 和 activeCoverID 定义！
+    // 🗑️ 删除了 selectedBook 属性
     
     // 🎛️ 尺寸对齐网页端
     let cardWidth: CGFloat = 220
@@ -32,11 +31,12 @@ struct CarouselCardItem: View {
         return VStack(spacing: 24) {
             
             // ===================================
-            // 封面区：封印贪婪视图的 ZStack
+            // 封面区
             // ===================================
             ZStack {
                 LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
-                    // ✨ 核心修复：移除了残余的 .matchedGeometryEffect
+                    .frame(width: cardWidth, height: cardHeight)
+                    // 🗑️ 删除了用于防残影的 opacity(0.01) 隐身逻辑，现在它始终正常显示
                 
                 // 黑化遮罩
                 if !isCenter {
@@ -67,17 +67,10 @@ struct CarouselCardItem: View {
             // 底部文字区
             // ===================================
             VStack(spacing: 6) {
-                Text(book.title)
-                    .font(.system(size: 24, weight: .black, design: .rounded))
-                    .foregroundColor(.primary)
-                    .lineLimit(1)
-                
-                Text(book.author.uppercased())
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .tracking(2)
-                    .foregroundColor(.indigo)
+                Text(book.title).font(.system(size: 24, weight: .black, design: .rounded)).foregroundColor(.primary).lineLimit(1)
+                Text(book.author.uppercased()).font(.system(size: 14, weight: .bold, design: .rounded)).tracking(2).foregroundColor(.indigo)
             }
-            .frame(width: cardWidth + 80) // 给文字留出足够的展现空间
+            .frame(width: cardWidth + 80)
             .opacity(isCenter ? 1 : 0)
             .offset(y: isCenter ? 0 : 20)
             .blur(radius: isCenter ? 0 : 5)

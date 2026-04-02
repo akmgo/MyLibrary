@@ -1,12 +1,13 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct GalleryBookCardView: View {
     let book: Book
     let showStatus: Bool
     let isFinishedTab: Bool
-    
-    // ✨ 核心修复：彻底删除了这里的 namespace 定义！
+    let namespace: Namespace.ID
+    let activeCoverID: String
+    let selectedBook: Book?
     
     @Environment(\.colorScheme) var colorScheme
     @State private var isHovered = false
@@ -23,31 +24,42 @@ struct GalleryBookCardView: View {
         let borderOverlayColor = isDark ? Color.white.opacity(0.1) : Color.twSlate200.opacity(0.5)
         
         VStack(alignment: .leading, spacing: 12) {
-            
             // ================= 1. 封面区 =================
-            Color.clear
-                .aspectRatio(2.0 / 3.0, contentMode: .fit)
-                .overlay(
-                    ZStack(alignment: .topTrailing) {
-                        LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
-                            // ✨ 核心修复：移除了残余的 .matchedGeometryEffect
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .clipped()
-                        
-                        LinearGradient(colors: [Color.white.opacity(isDark ? 0.05 : 0.2), .clear, Color.white.opacity(isDark ? 0.1 : 0.05)], startPoint: .topTrailing, endPoint: .bottomLeading)
-                        
-                        if showStatus {
-                            StatusPill(status: book.status, isPulsing: isPulsing)
-                                .padding(.top, 5)
-                                .padding(.trailing, 25)
-                        }
+            ZStack(alignment: .topTrailing) {
+                if selectedBook?.id != book.id {
+                    // 👉 状态 A：没被选中时
+                    LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
+                        // ✨ 关键对齐：先切 16 的圆角！
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        // ✨ 关键对齐：引擎同样放在最后！
+                        .matchedGeometryEffect(id: "gallery-\(book.id)", in: namespace)
+                        .frame(width: 160, height: 240)
+                } else {
+                    // 👉 状态 B：被选中起飞后留下的替身
+                    LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .frame(width: 160, height: 240)
+                        .opacity(0.001)
+                }
+                            
+                ZStack(alignment: .topTrailing) {
+                    LinearGradient(colors: [Color.white.opacity(isDark ? 0.05 : 0.2), .clear, Color.white.opacity(isDark ? 0.1 : 0.05)], startPoint: .topTrailing, endPoint: .bottomLeading)
+                    if showStatus {
+                        StatusPill(status: book.status, isPulsing: isPulsing)
+                            .padding(.top, 5)
+                            .padding(.trailing, 25)
                     }
-                )
+                }
+                .frame(width: 160, height: 240)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(borderOverlayColor, lineWidth: 1))
-                .shadow(color: shadowColor, radius: isHovered ? 20 : 8, y: isHovered ? 12 : 4)
-                .offset(y: isHovered ? -8 : 0)
-                .scaleEffect(isHovered ? 1.02 : 1.0)
+                .opacity(selectedBook?.id == book.id ? 0 : 1)
+            }
+            .frame(width: 160, height: 240)
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(borderOverlayColor, lineWidth: 1))
+            .shadow(color: shadowColor, radius: isHovered ? 20 : 8, y: isHovered ? 12 : 4)
+            .offset(y: isHovered ? -8 : 0)
+            .scaleEffect(isHovered ? 1.02 : 1.0)
+            .zIndex(selectedBook?.id == book.id ? 999 : 0)
             
             // ================= 2. 文本信息区 =================
             VStack(alignment: .leading, spacing: 4) {
@@ -59,14 +71,17 @@ struct GalleryBookCardView: View {
                 }
             }
             .padding(.horizontal, 4)
+            .zIndex(0) // ✨ 确保卡片下方的文字不挡住封面的放大过程
         }
         .contentShape(Rectangle())
         .onHover { h in withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { isHovered = h } }
         .onAppear { withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) { isPulsing = true } }
+        // ✨ 终极提权：让被点击的卡片在整个画廊瀑布流中拥有最高渲染优先级！
+        .zIndex(selectedBook?.id == book.id ? 999 : 0)
     }
 }
 
-// 战报区组件
+/// 战报区组件
 struct FinishedStatsView: View {
     let book: Book
     let isDark: Bool
@@ -79,7 +94,7 @@ struct FinishedStatsView: View {
             HStack {
                 HStack(spacing: 2) {
                     if book.rating > 0 {
-                        ForEach(1...5, id: \.self) { i in
+                        ForEach(1 ... 5, id: \.self) { i in
                             Image(systemName: "star.fill").font(.system(size: 10))
                                 .foregroundColor(i <= book.rating ? .yellow : (isDark ? .twSlate700 : .twSlate200))
                         }
@@ -125,6 +140,7 @@ struct FinishedStatsView: View {
         guard let d = date else { return "?" }
         let formatter = DateFormatter(); formatter.dateFormat = "yy/MM/dd"; return formatter.string(from: d)
     }
+
     private func calculateDays(start: Date?, end: Date?) -> Int {
         guard let s = start, let e = end else { return 1 }
         let days = Calendar.current.dateComponents([.day], from: s, to: e).day ?? 0
@@ -132,7 +148,7 @@ struct FinishedStatsView: View {
     }
 }
 
-// 状态胶囊组件
+/// 状态胶囊组件
 struct StatusPill: View {
     let status: String
     let isPulsing: Bool

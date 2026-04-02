@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct HeroBookCard: View {
     let book: Book
@@ -28,19 +28,24 @@ struct HeroBookCard: View {
                         .blur(radius: 30)
                         .offset(x: 20, y: 20)
                     
-                    // ✨ 核心修复：不使用透明度隐藏，而是完全替换组件，确保动画引擎捕获锚点！
+                    // ✨ 核心修复：同样采用 if-else 替身法，并严格规范修饰符顺序！
                     if selectedBook?.id != book.id {
                         LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
+                            // 2. 切圆角
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            // 3. ✨ 黄金法则：挂载引擎
                             .matchedGeometryEffect(id: "hero-\(book.id)", in: namespace)
                             .frame(width: 110, height: 160)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            // 4. 3D 旋转等形变必须放在引擎之后，否则起飞会扭曲！
                             .rotation3DEffect(.degrees(isHovered ? 12 : 0), axis: (x: 0, y: 1, z: -0.2), perspective: 0.5)
                             .offset(y: isHovered ? -8 : 0)
                             .shadow(color: Color.black.opacity(isHovered ? 0.3 : 0.1), radius: isHovered ? 15 : 5, x: 0, y: isHovered ? 10 : 5)
                     } else {
-                        // 隐身占位符，防止排版塌陷
-                        Color.clear
+                        // 👉 替身：占据同等位置，但完全透明，且没有 3D 旋转的干扰
+                        LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             .frame(width: 110, height: 160)
+                            .opacity(0.001)
                     }
                 }
                 

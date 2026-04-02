@@ -4,7 +4,7 @@ struct BookDossierView: View {
     @Bindable var book: Book
     var namespace: Namespace.ID
     var activeCoverID: String // ✨ 匹配目标 ID
-    var showContent: Bool     // ✨ 接收文本显隐开关
+    var showContent: Bool // ✨ 接收文本显隐开关
     
     @Environment(\.colorScheme) var colorScheme
     @State private var isHovered = false
@@ -20,7 +20,7 @@ struct BookDossierView: View {
         
         ZStack {
             // ================= 独立光晕层 =================
-            GeometryReader { geo in
+            GeometryReader { _ in
                 Circle()
                     .fill(Color.twSky500.opacity(isDark ? 0.1 : 0.2))
                     .frame(width: 400, height: 400)
@@ -32,7 +32,6 @@ struct BookDossierView: View {
             
             VStack(spacing: 40) {
                 HStack(alignment: .top, spacing: 60) {
-                    
                     // 👉 左侧：封面降落区（唯一不能消失的实体！）
                     ZStack {
                         Circle()
@@ -42,11 +41,14 @@ struct BookDossierView: View {
                             .offset(y: 20)
                             .opacity(showContent ? 1 : 0) // 封面底部光晕也跟随消失
                         
-                        // ✨ 绝对纯净的飞行着陆点！不要加 opacity(showContent)，让它以实体姿态完整飞回去！
+                        // ✨ 绝对纯净的飞行着陆点！
                         LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
+                            // 2. 切好圆角
+                            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                            // 4. ✨✨✨ 终极核心：引擎垫底！带着切好的 24 圆角卡片整体起飞，绝不被猫眼卡住！
                             .matchedGeometryEffect(id: activeCoverID, in: namespace)
                             .frame(width: 260, height: 390)
-                            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                            // 3. 附着高光层
                             .overlay(
                                 GeometryReader { geo in
                                     Rectangle()
@@ -57,15 +59,23 @@ struct BookDossierView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                                 .opacity(showContent ? 1 : 0)
                             )
-                            .shadow(color: .black.opacity(showContent ? 0.3 : 0), radius: showContent ? 20 : 0)
+                            
+                            // 5. 让飞行物体在穿梭空间中保持最高层级
+                            .zIndex(999)
+                            // 6. 阴影留在最外层，受控于 showContent 的淡入淡出
+                            .shadow(
+                                color: .black.opacity(showContent ? (isHovered ? 0.6 : 0.3) : 0),
+                                radius: isHovered ? 40 : 20,
+                                y: isHovered ? 25 : 12
+                            )
                     }
                     .frame(width: 260, height: 390)
                     .tiltCardEffect()
-                    .zIndex(2) // 保证飞行时在所有文字上方
+                    // ✨ 核心 1：确保左侧封面容器盖过右侧的文字
+                    .zIndex(999)
                     
                     // 👉 右侧：表单控制交互区 (受 showContent 统一控制)
                     VStack(alignment: .leading, spacing: 0) {
-                        
                         HStack(alignment: .lastTextBaseline) {
                             Text(book.title)
                                 .font(.system(size: 42, weight: .black, design: .rounded))
@@ -149,7 +159,7 @@ struct BookDossierView: View {
                                     DateSelectorButton(
                                         icon: "calendar",
                                         title: book.startTime?.formatted(date: .numeric, time: .omitted) ?? "开始日期",
-                                        action: { }
+                                        action: {}
                                     )
                                     Text("至")
                                         .font(.system(size: 14, weight: .bold))
@@ -158,7 +168,7 @@ struct BookDossierView: View {
                                         icon: "clock",
                                         title: book.endTime?.formatted(date: .numeric, time: .omitted) ?? "结束日期",
                                         isDisabled: book.status != "FINISHED",
-                                        action: { }
+                                        action: {}
                                     )
                                 }
                             }
@@ -173,7 +183,7 @@ struct BookDossierView: View {
                             
                             HStack {
                                 HStack(spacing: 8) {
-                                    ForEach(1...5, id: \.self) { star in
+                                    ForEach(1 ... 5, id: \.self) { star in
                                         let currentRating = hoverRating > 0 ? hoverRating : book.rating
                                         let isFilled = currentRating >= star
                                         Image(systemName: "star.fill")
@@ -211,6 +221,7 @@ struct BookDossierView: View {
                     // ✨ 文本整体淡入淡出，不阻碍封面起降
                     .opacity(showContent ? 1 : 0)
                     .offset(x: showContent ? 0 : 40)
+                    .zIndex(0) // 确保文字在底层
                 }
                 
                 // ================= 底部标签区 =================
@@ -272,7 +283,7 @@ struct BookDossierView: View {
     }
 }
 
-// 底部复用的 DateSelectorButton
+/// 底部复用的 DateSelectorButton
 struct DateSelectorButton: View {
     let icon: String
     let title: String

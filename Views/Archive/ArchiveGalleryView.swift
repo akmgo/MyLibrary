@@ -1,9 +1,11 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ArchiveGalleryView: View {
     let books: [Book]
+    let namespace: Namespace.ID
     @Binding var selectedBook: Book?
+    @Binding var activeCoverID: String
     
     @Environment(\.colorScheme) var colorScheme
     @State private var activeTab: String = "ALL"
@@ -93,8 +95,20 @@ struct ArchiveGalleryView: View {
                 
                 LazyVGrid(columns: columns, spacing: verticalSpacing) {
                     ForEach(displayBooks, id: \.id) { book in
-                        GalleryBookCardView(book: book, showStatus: activeTab == "ALL", isFinishedTab: activeTab == "FINISHED")
-                            .onTapGesture { selectedBook = book }
+                        GalleryBookCardView(book: book,
+                                            showStatus: activeTab == "ALL",
+                                            isFinishedTab: activeTab == "FINISHED",
+                                            namespace: namespace,
+                                            activeCoverID: activeCoverID,
+                                            selectedBook: selectedBook)
+                            .onTapGesture {
+                                // ✨ 设置起飞坐标，并包裹在弹簧动画中触发选中
+                                activeCoverID = "gallery-\(book.id)"
+                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                                    selectedBook = book
+                                }
+                            }
+                            .zIndex(selectedBook?.id == book.id ? 999 : 0)
                             .transition(.asymmetric(
                                 insertion: .scale(scale: 0.8).combined(with: .opacity).combined(with: .offset(y: 40)),
                                 removal: .scale(scale: 0.8).combined(with: .opacity)
@@ -118,24 +132,4 @@ struct ArchiveGalleryView: View {
         }
         if animate { withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { updateAction() } } else { updateAction() }
     }
-}
-
-#Preview("Light Mode - Gallery") {
-    @Previewable @State var selectedBook: Book? = nil
-    
-    Color.twSlate50.ignoresSafeArea()
-        .overlay(ArchiveGalleryView(books: PreviewData.allMockBooks, selectedBook: $selectedBook))
-        .frame(width: 1200, height: 900)
-        .preferredColorScheme(.light)
-        .modelContainer(PreviewData.shared)
-}
-
-#Preview("Dark Mode - Gallery") {
-    @Previewable @State var selectedBook: Book? = nil
-    
-    Color.twSlate900.ignoresSafeArea()
-        .overlay(ArchiveGalleryView(books: PreviewData.allMockBooks, selectedBook: $selectedBook))
-        .frame(width: 1200, height: 900)
-        .preferredColorScheme(.dark)
-        .modelContainer(PreviewData.shared)
 }
