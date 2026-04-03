@@ -63,11 +63,13 @@
       "size" : "256x256"
     },
     {
+      "filename" : "AppIcon-Light.jpg",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
+      "filename" : "AppIcon-Dark.jpg",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"

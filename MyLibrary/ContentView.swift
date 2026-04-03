@@ -81,6 +81,7 @@ struct ContentView: View {
         .ignoresSafeArea(edges: .top)
     }
     
+    
     private var homeScrollContent: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
