@@ -13,11 +13,8 @@ struct BookDetailView: View {
     
     @State private var showBackground = false
     @State private var showContent = false
-    
     @State private var showEditSheet = false
     @State private var showDeleteAlert = false
-    
-    /// ✨ 新增：把摘录弹窗的控制权提到详情页这一层，确保它能覆盖全屏
     @State private var showAddExcerptSheet = false
     
     var body: some View {
@@ -56,7 +53,6 @@ struct BookDetailView: View {
                         BookDossierView(book: book, namespace: namespace, activeCoverID: activeCoverID, showContent: showContent)
                             .zIndex(999)
                         
-                        // ✨ 传入控制开关
                         BookExcerptsView(book: book, showAddExcerpt: $showAddExcerptSheet)
                             .opacity(showContent ? 1 : 0)
                             .offset(y: showContent ? 0 : 20)
@@ -72,45 +68,29 @@ struct BookDetailView: View {
             // ================= 3. ✨ 编辑书籍弹窗引擎 =================
             if showEditSheet {
                 ZStack(alignment: .center) {
-                    Color.black.opacity(isDarkMode ? 0.5 : 0.2)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showEditSheet = false }
-                        }
-                        .transition(.opacity)
-                        .zIndex(1)
+                    Color.black.opacity(isDarkMode ? 0.5 : 0.2).ignoresSafeArea()
+                        .onTapGesture { withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showEditSheet = false } }
+                        .transition(.opacity).zIndex(1)
                     
                     BookEditorSheet(isPresented: $showEditSheet, bookToEdit: book)
-                        .transition(.asymmetric(
-                            insertion: .scale(scale: 0.9).combined(with: .opacity),
-                            removal: .scale(scale: 0.9).combined(with: .opacity)
-                        ))
+                        .transition(.asymmetric(insertion: .scale(scale: 0.9).combined(with: .opacity), removal: .scale(scale: 0.9).combined(with: .opacity)))
                         .zIndex(2)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .zIndex(1000) // ✨ 盖在所有内容之上
+                .frame(maxWidth: .infinity, maxHeight: .infinity).zIndex(1000)
             }
             
             // ================= 4. ✨ 新增摘录弹窗引擎 =================
             if showAddExcerptSheet {
                 ZStack(alignment: .center) {
-                    Color.black.opacity(isDarkMode ? 0.5 : 0.2)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showAddExcerptSheet = false }
-                        }
-                        .transition(.opacity)
-                        .zIndex(1)
+                    Color.black.opacity(isDarkMode ? 0.5 : 0.2).ignoresSafeArea()
+                        .onTapGesture { withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showAddExcerptSheet = false } }
+                        .transition(.opacity).zIndex(1)
                     
                     AddExcerptSheet(isPresented: $showAddExcerptSheet, book: book)
-                        .transition(.asymmetric(
-                            insertion: .scale(scale: 0.9).combined(with: .opacity),
-                            removal: .scale(scale: 0.9).combined(with: .opacity)
-                        ))
+                        .transition(.asymmetric(insertion: .scale(scale: 0.9).combined(with: .opacity), removal: .scale(scale: 0.9).combined(with: .opacity)))
                         .zIndex(2)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .zIndex(1001) // ✨ 盖在所有内容之上
+                .frame(maxWidth: .infinity, maxHeight: .infinity).zIndex(1001)
             }
             
         }
@@ -125,9 +105,7 @@ struct BookDetailView: View {
                 closeDetail()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { modelContext.delete(book) }
             }
-        } message: {
-            Text("确定要删除《\(book.title)》吗？相关的读书笔记也会一并清除。")
-        }
+        } message: { Text("确定要删除《\(book.title)》吗？相关的读书笔记也会一并清除。") }
     }
     
     private func closeDetail() {
@@ -138,26 +116,12 @@ struct BookDetailView: View {
         }
     }
 }
-/// 预览 Wrapper
+
+// 预览 Wrapper
 struct BookDetailPreviewWrapper: View {
     let book: Book
     @Namespace var namespace
     @State var selectedBook: Book? = nil
-    @State var activeCoverID: String = "preview" // ✨ 增加 @State
-    
-    var body: some View {
-        BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook) // ✨ 加 $
-    }
-}
-
-#Preview("Light Mode - Book Detail") {
-    BookDetailPreviewWrapper(book: Book(title: "中国人的精神", author: "辜鸿铭", status: "READING", tags: []))
-        .frame(width: 1400, height: 950)
-        .preferredColorScheme(.light)
-}
-
-#Preview("Dark Mode - Book Detail") {
-    BookDetailPreviewWrapper(book: Book(title: "理想国", author: "柏拉图", status: "FINISHED", tags: []))
-        .frame(width: 1400, height: 950)
-        .preferredColorScheme(.dark)
+    @State var activeCoverID: String = "preview"
+    var body: some View { BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook) }
 }

@@ -73,7 +73,7 @@ struct ArchiveGalleryView: View {
                                         .foregroundColor(isActive ? (isDark ? .white : .twSlate800) : (isDark ? .twSlate400 : .twSlate500))
                                 }
                                 .frame(height: 32).frame(maxWidth: .infinity)
-                            }.buttonStyle(.plain)
+                            }.buttonStyle(.plain).pointingHand()
                         }
                     }
                     .padding(4).frame(width: 200)

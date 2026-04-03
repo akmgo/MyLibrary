@@ -2,21 +2,6 @@
 import SwiftUI
 
 extension Color {
-    /// 统一的 16 进制颜色解析器
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default: (a, r, g, b) = (1, 1, 1, 0)
-        }
-        self.init(.sRGB, red: Double(r)/255, green: Double(g)/255, blue: Double(b)/255, opacity: Double(a)/255)
-    }
-
     // 基础色板
     static let twSlate50 = Color(red: 248/255, green: 250/255, blue: 252/255)
     static let twSlate100 = Color(red: 241/255, green: 245/255, blue: 249/255)
@@ -73,10 +58,4 @@ extension Color {
     static let twFuchsia400 = Color(hex: "e879f9")
 
     static let twPurple400 = Color(hex: "c084fc")
-
-    /// Teal (蓝绿/青色系列)
-    static let twTeal600 = Color(hex: "0d9488")
-
-    /// Fuchsia (洋红系列补充)
-    static let twFuchsia600 = Color(hex: "c026d3")
 }

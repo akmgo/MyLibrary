@@ -6,16 +6,15 @@ struct AddExcerptSheet: View {
     @Environment(\.modelContext) private var modelContext
     
     @Binding var isPresented: Bool
-    
-    @State private var excerptText: String = ""
-    let mintGreen = Color(red: 0.46, green: 0.81, blue: 0.67)
     let book: Book
+    @State private var excerptText: String = ""
+    
+    let mintGreen = Color(red: 0.46, green: 0.81, blue: 0.67)
     
     var body: some View {
         let isDark = colorScheme == .dark
         
         ZStack(alignment: .topLeading) {
-            // 保留极光氛围效果，垫在内容下方
             Circle()
                 .fill(mintGreen.opacity(isDark ? 0.2 : 0.3))
                 .frame(width: 250, height: 250)
@@ -25,24 +24,17 @@ struct AddExcerptSheet: View {
             
             VStack(alignment: .leading, spacing: 20) {
                 HStack(spacing: 12) {
-                    Image(systemName: "text.quote")
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundColor(mintGreen)
-                    
-                    Text("新增摘录")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundColor(isDark ? .white : .twSlate800)
+                    Image(systemName: "text.quote").font(.system(size: 22, weight: .semibold)).foregroundColor(mintGreen)
+                    Text("新增摘录").font(.system(size: 20, weight: .bold, design: .rounded)).foregroundColor(isDark ? .white : .twSlate800)
                 }
                 .padding(.top, 36).padding(.horizontal, 36)
                 
                 ZStack(alignment: .topLeading) {
                     if excerptText.isEmpty {
                         Text("输入那些值得被铭记的内容...")
-                            .font(.system(size: 15))
-                            .foregroundColor(isDark ? .twSlate500 : .twSlate400)
+                            .font(.system(size: 15)).foregroundColor(isDark ? .twSlate500 : .twSlate400)
                             .padding(.top, 16).padding(.leading, 16)
-                            .zIndex(1)
-                            .allowsHitTesting(false)
+                            .zIndex(1).allowsHitTesting(false)
                     }
                     
                     TextEditor(text: $excerptText)
@@ -56,14 +48,12 @@ struct AddExcerptSheet: View {
                 
                 Spacer()
                 
-                Rectangle()
-                    .fill(isDark ? Color.white.opacity(0.05) : Color.twSlate100)
-                    .frame(height: 1).padding(.horizontal, 36)
+                Rectangle().fill(isDark ? Color.white.opacity(0.05) : Color.twSlate100).frame(height: 1).padding(.horizontal, 36)
                 
                 HStack {
-                    HoverCancelButton(isDark: isDark) { withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
-                        isPresented = false
-                    } }
+                    HoverCancelButton(isDark: isDark) {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { isPresented = false }
+                    }
                     Spacer()
                     ExcerptSubmitButton { saveExcerpt() }
                 }
@@ -71,7 +61,6 @@ struct AddExcerptSheet: View {
             }
         }
         .frame(width: 440, height: 480)
-        // ✨ 套上弹窗三连！
         .liquidSheet(isDark: isDark)
         .shadow(color: .black.opacity(isDark ? 0.5 : 0.15), radius: 40, y: 20)
         .presentationBackground(.clear)
@@ -83,8 +72,6 @@ struct AddExcerptSheet: View {
         if book.excerpts == nil { book.excerpts = [] }
         book.excerpts?.append(newExcerpt)
         try? modelContext.save()
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
-                    isPresented = false
-                }
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { isPresented = false }
     }
 }
