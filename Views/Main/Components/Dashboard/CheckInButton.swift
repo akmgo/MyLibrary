@@ -1,15 +1,12 @@
-//
-//  CheckInButton.swift
-//  MyLibrary
-//
-//  Created by akram on 2026/3/31.
-//
-
-import Foundation
-
+import SwiftData
 import SwiftUI
 
 struct CheckInButton: View {
+    // ✨ 1. 引入数据库上下文
+    @Environment(\.modelContext) private var modelContext
+    // ✨ 2. 查询当前正在阅读的书籍
+    @Query(filter: #Predicate<Book> { $0.status == "READING" }) var readingBooks: [Book]
+    
     @Binding var hasCheckedIn: Bool
     @State private var isLoading = false
     @State private var shimmerOffset: CGFloat = -1.0
@@ -71,6 +68,12 @@ struct CheckInButton: View {
             withAnimation(.spring()) {
                 isLoading = false
                 hasCheckedIn = true
+                
+                // ✨ 3. 终极闭环：在动画结束的瞬间，把记录写进数据库！
+                let currentBook = readingBooks.first
+                let newRecord = ReadingRecord(date: Date(), book: currentBook)
+                modelContext.insert(newRecord)
+                try? modelContext.save()
             }
         }
     }

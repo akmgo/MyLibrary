@@ -13,6 +13,6 @@ struct MyLibraryApp: App {
         .windowResizability(.contentMinSize)
         #endif
         
-        .modelContainer(for: [Book.self, Excerpt.self])
+        .modelContainer(for: [Book.self, Excerpt.self, ReadingRecord.self])
     }
 }

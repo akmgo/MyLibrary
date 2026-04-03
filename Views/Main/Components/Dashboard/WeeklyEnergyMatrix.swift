@@ -3,7 +3,9 @@ import SwiftUI
 struct WeeklyEnergyMatrix: View {
     let continuousDays: Int
     let weekData: [Bool]
+    let todayIndex: Int // ✨ 新增传入真实的今天位置
     let days = ["一", "二", "三", "四", "五", "六", "日"]
+    
     @State private var isHovered = false
     @Environment(\.colorScheme) var colorScheme
     
@@ -31,7 +33,7 @@ struct WeeklyEnergyMatrix: View {
                 
                 HStack(spacing: 0) {
                     ForEach(0..<7, id: \.self) { index in
-                        let isToday = index == 1
+                        let isToday = index == todayIndex // ✨ 动态匹配今天
                         let isActive = weekData[index]
                         
                         VStack(spacing: 12) {
@@ -87,20 +89,4 @@ struct EnergyBlock: View {
         .scaleEffect(isActive ? 1.05 : 1.0)
         .onAppear { if isToday && !isActive { withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { isPulsing = true } } }
     }
-}
-
-// 预览环境
-#Preview("Light Mode") {
-    WeeklyEnergyMatrix(continuousDays: 3, weekData: [false, true, false, false, false, false, false])
-        .frame(width: 400, height: 180)
-        .padding()
-        .preferredColorScheme(.light)
-}
-
-#Preview("Dark Mode") {
-    WeeklyEnergyMatrix(continuousDays: 3, weekData: [false, true, false, false, false, false, false])
-        .frame(width: 400, height: 180)
-        .padding()
-        .preferredColorScheme(.dark)
-        .background(Color.black.ignoresSafeArea())
 }

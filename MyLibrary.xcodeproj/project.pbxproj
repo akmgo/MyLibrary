@@ -16,6 +16,8 @@
 		C53E9E392F7EA0860022A698 /* LiquidButtonModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E382F7EA0860022A698 /* LiquidButtonModifier.swift */; };
 		C53E9E3D2F7EAD9B0022A698 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E3C2F7EAD9B0022A698 /* CustomTextField.swift */; };
 		C53E9E3F2F7EAF640022A698 /* LiquidSheetModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E3E2F7EAF640022A698 /* LiquidSheetModifier.swift */; };
+		C53E9E412F7F4DEE0022A698 /* ReadingRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E402F7F4DEE0022A698 /* ReadingRecord.swift */; };
+		C53E9E432F7F4E800022A698 /* MonthlyRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E422F7F4E800022A698 /* MonthlyRecordView.swift */; };
 		C582E1872F7B655500C95473 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C582E1862F7B655500C95473 /* Assets.xcassets */; };
 		C582E1B12F7B66CF00C95473 /* View+GlassEffect.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B02F7B66CF00C95473 /* View+GlassEffect.swift.swift */; };
 		C582E1B32F7B66FA00C95473 /* BookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1B22F7B66FA00C95473 /* BookCardView.swift */; };
@@ -71,6 +73,8 @@
 		C53E9E382F7EA0860022A698 /* LiquidButtonModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidButtonModifier.swift; sourceTree = "<group>"; };
 		C53E9E3C2F7EAD9B0022A698 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		C53E9E3E2F7EAF640022A698 /* LiquidSheetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidSheetModifier.swift; sourceTree = "<group>"; };
+		C53E9E402F7F4DEE0022A698 /* ReadingRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingRecord.swift; sourceTree = "<group>"; };
+		C53E9E422F7F4E800022A698 /* MonthlyRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyRecordView.swift; sourceTree = "<group>"; };
 		C582E17D2F7B655400C95473 /* MyLibrary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyLibrary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C582E1862F7B655500C95473 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C582E18C2F7B655500C95473 /* MyLibraryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyLibraryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -178,6 +182,7 @@
 			children = (
 				C582E1AF2F7B668100C95473 /* Excerpt.swift */,
 				C582E1AE2F7B665200C95473 /* Book.swift */,
+				C53E9E402F7F4DEE0022A698 /* ReadingRecord.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -215,6 +220,7 @@
 				C582E1BE2F7B6B2800C95473 /* YearlyTimelineView.swift */,
 				C582E1B82F7B67B600C95473 /* ArchiveGalleryView.swift */,
 				C53E9DCE2F7D01770022A698 /* GalleryBookCardView.swift */,
+				C53E9E422F7F4E800022A698 /* MonthlyRecordView.swift */,
 			);
 			path = Archive;
 			sourceTree = "<group>";
@@ -466,6 +472,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C582E1E42F7BBDFD00C95473 /* PreviewData.swift in Sources */,
+				C53E9E432F7F4E800022A698 /* MonthlyRecordView.swift in Sources */,
 				C582E1F12F7BC65B00C95473 /* MonthReadingCard.swift in Sources */,
 				C53E9E392F7EA0860022A698 /* LiquidButtonModifier.swift in Sources */,
 				C53E9E3F2F7EAF640022A698 /* LiquidSheetModifier.swift in Sources */,
@@ -480,6 +487,7 @@
 				C582E1B32F7B66FA00C95473 /* BookCardView.swift in Sources */,
 				C5DCF7742F7CCF0C00428041 /* BookExcerptsView.swift.swift in Sources */,
 				C53E9DCF2F7D01770022A698 /* GalleryBookCardView.swift in Sources */,
+				C53E9E412F7F4DEE0022A698 /* ReadingRecord.swift in Sources */,
 				C582E1BB2F7B690D00C95473 /* Book.swift in Sources */,
 				C582E1DE2F7BB34E00C95473 /* HeroBookCard.swift in Sources */,
 				C582E1DB2F7BA58000C95473 /* CarouselWidget.swift in Sources */,

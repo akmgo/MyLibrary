@@ -1,15 +1,20 @@
+import SwiftData
 import SwiftUI
 
 struct BookDossierView: View {
     @Bindable var book: Book
     var namespace: Namespace.ID
-    var activeCoverID: String // ✨ 匹配目标 ID
-    var showContent: Bool // ✨ 接收文本显隐开关
+    var activeCoverID: String
+    var showContent: Bool
     
     @Environment(\.colorScheme) var colorScheme
     @State private var isHovered = false
     @State private var hoverRating: Int = 0
     @Namespace private var animationNamespace
+    
+    // ✨ 新增：用于控制真实日历弹窗的开关
+    @State private var showStartDatePicker = false
+    @State private var showEndDatePicker = false
     
     let statusOptions = [("UNREAD", "待读"), ("READING", "在读"), ("FINISHED", "已读完")]
     let ratingTexts = ["", "⭐ 一星毒草", "⭐⭐ 二星平庸", "⭐⭐⭐ 三星粮草", "⭐⭐⭐⭐ 四星推荐", "🔥 改变人生"]
@@ -28,27 +33,23 @@ struct BookDossierView: View {
                     .position(x: 0, y: 0)
             }
             .allowsHitTesting(false)
-            .opacity(showContent ? 1 : 0) // 背景光晕随内容消失
+            .opacity(showContent ? 1 : 0)
             
             VStack(spacing: 40) {
                 HStack(alignment: .top, spacing: 60) {
-                    // 👉 左侧：封面降落区（唯一不能消失的实体！）
+                    // 👉 左侧：封面降落区
                     ZStack {
                         Circle()
                             .fill(Color.twIndigo500.opacity(0.2))
                             .frame(width: 220, height: 220)
                             .blur(radius: 40)
                             .offset(y: 20)
-                            .opacity(showContent ? 1 : 0) // 封面底部光晕也跟随消失
+                            .opacity(showContent ? 1 : 0)
                         
-                        // ✨ 绝对纯净的飞行着陆点！
                         LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
-                            // 2. 切好圆角
                             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                            // 4. ✨✨✨ 终极核心：引擎垫底！带着切好的 24 圆角卡片整体起飞，绝不被猫眼卡住！
                             .matchedGeometryEffect(id: activeCoverID, in: namespace)
                             .frame(width: 260, height: 390)
-                            // 3. 附着高光层
                             .overlay(
                                 GeometryReader { geo in
                                     Rectangle()
@@ -59,10 +60,7 @@ struct BookDossierView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                                 .opacity(showContent ? 1 : 0)
                             )
-                            
-                            // 5. 让飞行物体在穿梭空间中保持最高层级
                             .zIndex(999)
-                            // 6. 阴影留在最外层，受控于 showContent 的淡入淡出
                             .shadow(
                                 color: .black.opacity(showContent ? (isHovered ? 0.6 : 0.3) : 0),
                                 radius: isHovered ? 40 : 20,
@@ -71,10 +69,9 @@ struct BookDossierView: View {
                     }
                     .frame(width: 260, height: 390)
                     .tiltCardEffect()
-                    // ✨ 核心 1：确保左侧封面容器盖过右侧的文字
                     .zIndex(999)
                     
-                    // 👉 右侧：表单控制交互区 (受 showContent 统一控制)
+                    // 👉 右侧：表单控制交互区
                     VStack(alignment: .leading, spacing: 0) {
                         HStack(alignment: .lastTextBaseline) {
                             Text(book.title)
@@ -93,6 +90,7 @@ struct BookDossierView: View {
                         Divider().background(isDark ? Color.white.opacity(0.1) : Color.twSlate200)
                         Spacer(minLength: 20)
                         
+                        // ✨【组件 1：状态与智能联动】
                         VStack(alignment: .leading, spacing: 12) {
                             Label("当前状态", systemImage: "book.fill")
                                 .font(.system(size: 14, weight: .bold))
@@ -104,6 +102,14 @@ struct BookDossierView: View {
                                     Button(action: {
                                         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                                             book.status = opt.0
+                                            
+                                            // 自动填充逻辑依然保留
+                                            if opt.0 == "READING", book.startTime == nil {
+                                                book.startTime = Date()
+                                            } else if opt.0 == "FINISHED" {
+                                                if book.startTime == nil { book.startTime = Date() }
+                                                if book.endTime == nil { book.endTime = Date() }
+                                            }
                                         }
                                     }) {
                                         ZStack {
@@ -126,56 +132,80 @@ struct BookDossierView: View {
                             .padding(4)
                             .background(isDark ? Color.twSlate950.opacity(0.5) : Color.twSlate100.opacity(0.5))
                             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(isDark ? Color.twSlate700.opacity(0.5) : Color.twSlate200, lineWidth: 1)
-                            )
+                            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(isDark ? Color.twSlate700.opacity(0.5) : Color.twSlate200, lineWidth: 1))
                         }
                         
                         Spacer(minLength: 20)
                         
+                        // ✨【组件 2：完美紧凑的日历选择引擎】
                         VStack(alignment: .leading, spacing: 12) {
                             Label("阅读旅程", systemImage: "calendar")
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(isDark ? .twSlate400 : .twSlate600)
-                            
+                                                    
                             if book.status == "UNREAD" {
                                 ZStack(alignment: .leading) {
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(isDark ? Color.twSlate950.opacity(0.5) : Color.twSlate100.opacity(0.5))
-                                        .frame(height: 44)
-                                    Text("Waiting for the journey to begin...")
-                                        .font(.system(size: 14, weight: .medium, design: .serif))
-                                        .italic()
-                                        .foregroundColor(isDark ? .twSlate500 : .twSlate400)
-                                        .padding(.horizontal, 20)
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous).fill(isDark ? Color.twSlate950.opacity(0.5) : Color.twSlate100.opacity(0.5)).frame(height: 44)
+                                    Text("Waiting for the journey to begin...").font(.system(size: 14, weight: .medium, design: .serif)).italic().foregroundColor(isDark ? .twSlate500 : .twSlate400).padding(.horizontal, 20)
                                 }
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .stroke(isDark ? Color.twSlate700.opacity(0.5) : Color.twSlate200, lineWidth: 1)
-                                )
+                                .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isDark ? Color.twSlate700.opacity(0.5) : Color.twSlate200, lineWidth: 1))
                             } else {
                                 HStack(spacing: 16) {
+                                    // ✨ 开始日期按钮 & Popover
                                     DateSelectorButton(
                                         icon: "calendar",
                                         title: book.startTime?.formatted(date: .numeric, time: .omitted) ?? "开始日期",
-                                        action: {}
+                                        action: { showStartDatePicker = true }
                                     )
-                                    Text("至")
-                                        .font(.system(size: 14, weight: .bold))
-                                        .foregroundColor(.twSlate400)
+                                    .popover(isPresented: $showStartDatePicker, arrowEdge: .bottom) {
+                                        // 👉 加入紧凑排版和小标题，去掉强制宽高
+                                        VStack(spacing: 12) {
+                                            Text("设定开始日期")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundColor(isDark ? .twSlate400 : .twSlate500)
+                                                                    
+                                            DatePicker("", selection: Binding(
+                                                get: { book.startTime ?? Date() },
+                                                set: { book.startTime = $0 }
+                                            ), displayedComponents: .date)
+                                                .datePickerStyle(.graphical)
+                                                .labelsHidden()
+                                        }
+                                        .padding(20) // 给内容留出均匀的呼吸空间
+                                    }
+                                                            
+                                    Text("至").font(.system(size: 14, weight: .bold)).foregroundColor(.twSlate400)
+                                                            
+                                    // ✨ 结束日期按钮 & Popover
                                     DateSelectorButton(
                                         icon: "clock",
                                         title: book.endTime?.formatted(date: .numeric, time: .omitted) ?? "结束日期",
                                         isDisabled: book.status != "FINISHED",
-                                        action: {}
+                                        action: { showEndDatePicker = true }
                                     )
+                                    .popover(isPresented: $showEndDatePicker, arrowEdge: .bottom) {
+                                        // 👉 同样去掉强制宽高
+                                        VStack(spacing: 12) {
+                                            Text("设定结束日期")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundColor(isDark ? .twSlate400 : .twSlate500)
+                                                                    
+                                            DatePicker("", selection: Binding(
+                                                get: { book.endTime ?? Date() },
+                                                set: { book.endTime = $0 }
+                                            ), displayedComponents: .date)
+                                                .datePickerStyle(.graphical)
+                                                .labelsHidden()
+                                        }
+                                        .padding(20)
+                                    }
                                 }
                             }
                         }
                         
                         Spacer(minLength: 20)
                         
+                        // ✨【组件 3：评分联动】
                         VStack(alignment: .leading, spacing: 12) {
                             Label("个人评价", systemImage: "star.fill")
                                 .font(.system(size: 14, weight: .bold))
@@ -199,7 +229,7 @@ struct BookDossierView: View {
                                     }
                                 }
                                 Spacer()
-                                let displayText = hoverRating > 0 ? ratingTexts[hoverRating] : ratingTexts[book.rating]
+                                let displayText = hoverRating > 0 ? ratingTexts[hoverRating] : (book.rating < ratingTexts.count ? ratingTexts[book.rating] : "")
                                 Text(displayText)
                                     .font(.system(size: 15, weight: .bold))
                                     .foregroundColor(.yellow)
@@ -210,21 +240,17 @@ struct BookDossierView: View {
                             .frame(maxWidth: .infinity)
                             .background(isDark ? Color.twSlate950.opacity(0.4) : Color.white.opacity(0.5))
                             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(isDark ? Color.twSlate700.opacity(0.5) : Color.twSlate200, lineWidth: 1)
-                            )
+                            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(isDark ? Color.twSlate700.opacity(0.5) : Color.twSlate200, lineWidth: 1))
                         }
                     }
                     .frame(height: 390)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    // ✨ 文本整体淡入淡出，不阻碍封面起降
                     .opacity(showContent ? 1 : 0)
                     .offset(x: showContent ? 0 : 40)
-                    .zIndex(0) // 确保文字在底层
+                    .zIndex(0)
                 }
                 
-                // ================= 底部标签区 =================
+                // ================= ✨ 底部：知识标签库联动作 =================
                 VStack(alignment: .leading, spacing: 20) {
                     HStack {
                         Label("知识标签库", systemImage: "tag.fill")
@@ -243,8 +269,11 @@ struct BookDossierView: View {
                             let isMaxed = book.tags.count >= 3 && !isSelected
                             Button(action: {
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                    if isSelected { book.tags.removeAll(where: { $0 == tag }) }
-                                    else if book.tags.count < 3 { book.tags.append(tag) }
+                                    if isSelected {
+                                        book.tags.removeAll(where: { $0 == tag })
+                                    } else if book.tags.count < 3 {
+                                        book.tags.append(tag)
+                                    }
                                 }
                             }) {
                                 Text(tag)
@@ -267,13 +296,11 @@ struct BookDossierView: View {
                     }
                 }
                 .padding(.top, 10)
-                // ✨ 底部组件同样由 showContent 控制
                 .opacity(showContent ? 1 : 0)
                 .offset(y: showContent ? 0 : 20)
             }
             .padding(40)
         }
-        // ✨ 将毛玻璃提到最底层背景中，并与文本内容一同淡出
         .background(
             Color.clear
                 .outerGlassBlockStyle()

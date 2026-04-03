@@ -8,7 +8,7 @@ final class Book {
     var title: String
     var author: String
     
-    // ✨ 只有这个字段负责存封面
+    /// ✨ 只有这个字段负责存封面
     @Attribute(.externalStorage) var coverData: Data?
     
     var status: String
@@ -16,8 +16,10 @@ final class Book {
     var tags: [String]
     var startTime: Date?
     var endTime: Date?
+    var progress: Int = 0
     
     @Relationship(deleteRule: .cascade) var excerpts: [Excerpt]? = []
+    @Relationship(deleteRule: .cascade) var reading_record: [ReadingRecord]? = []
     
     init(id: String = UUID().uuidString,
          title: String,
@@ -27,7 +29,9 @@ final class Book {
          rating: Int = 0,
          tags: [String] = [],
          startTime: Date? = nil,
-         endTime: Date? = nil) {
+         endTime: Date? = nil,
+         progress: Int = 0)
+    {
         self.id = id
         self.title = title
         self.author = author
@@ -37,5 +41,6 @@ final class Book {
         self.tags = tags
         self.startTime = startTime
         self.endTime = endTime
+        self.progress = progress
     }
 }

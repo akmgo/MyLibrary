@@ -50,18 +50,7 @@ struct ContentView: View {
                     case "年度轨迹":
                         YearlyTimelineView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
                     case "月度记录":
-                        VStack {
-                            Spacer()
-                            Image(systemName: "calendar.badge.clock")
-                                .font(.system(size: 64))
-                                .foregroundColor(isDarkMode ? .twSlate600 : .twSlate400)
-                                .padding(.bottom, 16)
-                            Text("月度足迹模块开发中...")
-                                .font(.title2).bold()
-                                .foregroundColor(isDarkMode ? .twSlate500 : .twSlate400)
-                            Spacer()
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        MonthlyRecordView()
                     default:
                         EmptyView()
                     }
