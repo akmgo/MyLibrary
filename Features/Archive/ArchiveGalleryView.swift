@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct ArchiveGalleryView: View {
-    let books: [Book]
+    @Query var books: [Book]
     let namespace: Namespace.ID
     @Binding var selectedBook: Book?
     @Binding var activeCoverID: String
@@ -10,6 +10,7 @@ struct ArchiveGalleryView: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var activeTab: String = "ALL"
     @State private var displayBooks: [Book] = []
+    @State private var hoveredTab: String? = nil
     @Namespace private var tabNamespace
     
     let tabs: [(String, String)] = [("UNREAD", "待读"), ("ALL", "全部"), ("FINISHED", "已读")]
@@ -26,7 +27,9 @@ struct ArchiveGalleryView: View {
                 .padding(.bottom, 60)
         }
         .ignoresSafeArea(edges: .top)
-        .onAppear { updateDisplayBooks(animate: true) }
+        .onAppear { updateDisplayBooks(animate: false) }
+        // 只有在用户主动点击 Tab 切换分类（比如从“全部”切到“已读”）时，才触发排序动画
+        .onChange(of: books) { _, _ in updateDisplayBooks(animate: true) }
     }
     
     @ViewBuilder
@@ -58,28 +61,40 @@ struct ArchiveGalleryView: View {
                     HStack(spacing: 0) {
                         ForEach(tabs, id: \.0) { tab in
                             let isActive = activeTab == tab.0
+                            let isHovered = hoveredTab == tab.0
+                                                
+                            let activeColor = isDark ? Color.white : Color.twSlate900
+                            let inactiveColor = isDark ? Color.twSlate400 : Color.twSlate500
+                            let hoverColor = isDark ? Color.white.opacity(0.85) : Color.twSlate700
+                                                
                             Button(action: {
                                 withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { activeTab = tab.0 }
                                 updateDisplayBooks(animate: true)
                             }) {
                                 ZStack {
+                                    // ✨ 同样去掉了灰底，保持极简
                                     if isActive {
                                         RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                            .fill(isDark ? Color.twSlate700 : .white)
-                                            .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
+                                            .fill(isDark ? Color.white.opacity(0.15) : Color.black.opacity(0.08))
                                             .matchedGeometryEffect(id: "gallery-tab", in: tabNamespace)
                                     }
+                                                        
                                     Text(tab.1).font(.system(size: 13, weight: .bold))
-                                        .foregroundColor(isActive ? (isDark ? .white : .twSlate800) : (isDark ? .twSlate400 : .twSlate500))
+                                        // ✨ 悬浮时字体提亮
+                                        .foregroundColor(isActive ? activeColor : (isHovered ? hoverColor : inactiveColor))
                                 }
                                 .frame(height: 32).frame(maxWidth: .infinity)
-                            }.buttonStyle(.plain).pointingHand()
+                                // ✨ 悬浮时微微跃起放大
+                                .scaleEffect((isHovered || isActive) ? 1.05 : 1.0)
+                            }
+                            .buttonStyle(.plain).pointingHand()
+                            .onHover { h in
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { hoveredTab = h ? tab.0 : nil }
+                            }
                         }
                     }
                     .padding(4).frame(width: 200)
-                    .background(isDark ? Color.twSlate800.opacity(0.4) : Color.twSlate200.opacity(0.4)).background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(isDark ? Color.twSlate700.opacity(0.3) : Color.white.opacity(0.5), lineWidth: 1))
+                    .liquidGlass(cornerRadius: 16, isDark: isDark)
                 }
                 .padding(.horizontal, 10)
                 

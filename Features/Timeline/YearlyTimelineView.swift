@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct YearlyTimelineView: View {
-    let books: [Book]
+    @Query var books: [Book]
     let namespace: Namespace.ID
     @Binding var selectedBook: Book?
     @Binding var activeCoverID: String
@@ -170,20 +170,4 @@ private struct TimelineCardView: View {
         }
         .frame(maxWidth: .infinity, alignment: isCardOnLeft ? .trailing : .leading).zIndex(0)
     }
-}
-
-#Preview("Light Mode - Yearly Timeline") {
-    @Previewable @Namespace var ns
-    @Previewable @State var selectedBook: Book? = nil
-    @Previewable @State var activeCoverID = ""
-    YearlyTimelineView(books: PreviewData.allMockBooks, namespace: ns, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
-        .frame(width: 1200, height: 900).preferredColorScheme(.light).modelContainer(PreviewData.shared)
-}
-
-#Preview("Dark Mode - Yearly Timeline") {
-    @Previewable @Namespace var ns
-    @Previewable @State var selectedBook: Book? = nil
-    @Previewable @State var activeCoverID = ""
-    YearlyTimelineView(books: PreviewData.allMockBooks, namespace: ns, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
-        .frame(width: 1200, height: 900).preferredColorScheme(.dark).modelContainer(PreviewData.shared)
 }

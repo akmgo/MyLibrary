@@ -6,7 +6,6 @@ struct ContentView: View {
     @AppStorage("isDarkMode") private var isDarkMode: Bool = false
     
     @Query(filter: #Predicate<Book> { $0.status == "READING" }) var readingBooks: [Book]
-    @Query var allBooks: [Book]
     
     let pagePadding: CGFloat = 30
     let widgetSpacing: CGFloat = 60
@@ -21,84 +20,67 @@ struct ContentView: View {
     @Namespace private var mainTabNamespace
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .top) {
-                // 1. 绝对底层背景
-                FluidBackgroundView(isDark: isDarkMode)
-                
-                // 2. 内容路由引擎
-                Group {
-                    switch currentMainTab {
-                    case "阅读主页":
-                        homeScrollContent
-                    case "全景画廊":
-                        ArchiveGalleryView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
-                    case "3D漫游":
-                        // ✨ 单独抽离的 3D 画廊模块
-                        ZStack {
-                            if allBooks.isEmpty {
-                                Text("暂无书籍，去主页录入第一本吧").foregroundColor(.twSlate500)
-                            } else {
-                                CarouselWidget(books: allBooks)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            }
-                        }
-                        .padding(.top, 100) // 避开导航栏
-                    case "年度轨迹":
-                        YearlyTimelineView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
-                    case "月度记录":
-                        MonthlyRecordView()
-                    default:
-                        EmptyView()
-                    }
-                }
-                .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
-                .animation(.easeInOut(duration: 0.4), value: currentMainTab)
-                
-                // 3. 抽离后的悬浮导航栏
-                TopNavigationBarView(
-                    currentMainTab: $currentMainTab,
-                    showAddModal: $showAddModal,
-                    isDarkMode: $isDarkMode,
-                    mainTabNamespace: mainTabNamespace
-                )
-                
-                // 4. 详情页悬浮罩
-                if let book = selectedBook {
-                    BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook)
-                        .zIndex(100)
-                        .transition(.asymmetric(insertion: .identity, removal: .offset(x: 0.001, y: 0)))
-                }
-                
-                // 5. 录入书籍弹窗
-                if showAddModal {
-                    ZStack(alignment: .center) {
-                        Color.black.opacity(isDarkMode ? 0.5 : 0.2)
-                            .ignoresSafeArea()
-                            .onTapGesture { withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showAddModal = false } }
-                            .transition(.opacity)
-                            .zIndex(1)
-                        
-                        BookEditorSheet(isPresented: $showAddModal, bookToEdit: nil)
-                            .transition(.asymmetric(insertion: .scale(scale: 0.9).combined(with: .opacity), removal: .scale(scale: 0.9).combined(with: .opacity)))
-                            .zIndex(2)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .zIndex(101)
+        ZStack(alignment: .top) {
+            FluidBackgroundView(isDark: isDarkMode)
+            
+            Group {
+                switch currentMainTab {
+                case "阅读主页":
+                    homeScrollContent
+                case "全景画廊":
+                    ArchiveGalleryView(namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
+                case "3D漫游":
+                    CarouselWidget()
+                        .padding(.top, 100)
+                case "年度轨迹":
+                    YearlyTimelineView(namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
+                case "月度记录":
+                    MonthlyRecordView()
+                default:
+                    EmptyView()
                 }
             }
-            .navigationTitle("")
-            #if os(macOS)
-            .toolbarBackground(.hidden, for: .windowToolbar)
-            #else
-            .toolbarBackground(.hidden, for: .navigationBar)
-            #endif
-            .preferredColorScheme(isDarkMode ? .dark : .light)
-            .animation(.spring(response: 0.4, dampingFraction: 0.75), value: showAddModal)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .transition(.opacity)
+            .animation(.easeInOut(duration: 0.3), value: currentMainTab)
+            
+            TopNavigationBarView(currentMainTab: $currentMainTab, showAddModal: $showAddModal, isDarkMode: $isDarkMode, mainTabNamespace: mainTabNamespace)
+            
+            // ================= ✨ 独立出来的深浅模式“灵动岛”按钮 =================
+            VStack {
+                HStack {
+                    Spacer()
+                    ThemeToggleButton(isDarkMode: $isDarkMode)
+                }
+                Spacer()
+            }
+            // ✨ 坐标完美对齐左上角的 macOS 原生红绿灯，但是放在右上角
+            .padding(.top, 10)
+            .padding(.trailing, 10)
+            .zIndex(105) // 保证在内容之上，但在弹窗之下
+            
+            // ================= 详情与弹窗层 =================
+            if let book = selectedBook {
+                BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook)
+                    .zIndex(200)
+                    .transition(.asymmetric(insertion: .identity, removal: .offset(x: 0.001, y: 0)))
+            }
+            
+            if showAddModal {
+                ZStack(alignment: .center) {
+                    Color.black.opacity(isDarkMode ? 0.5 : 0.2).ignoresSafeArea()
+                        .onTapGesture { withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { showAddModal = false } }.transition(.opacity).zIndex(1)
+                    BookEditorSheet(isPresented: $showAddModal, bookToEdit: nil)
+                        .transition(.asymmetric(insertion: .scale(scale: 0.9).combined(with: .opacity), removal: .scale(scale: 0.9).combined(with: .opacity))).zIndex(2)
+                }.frame(maxWidth: .infinity, maxHeight: .infinity).zIndex(101)
+            }
         }
+        .preferredColorScheme(isDarkMode ? .dark : .light)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // ✨ 终极绝杀：强迫整个 App 无视顶部系统安全区，彻底打碎最后一道边界线！
+        .ignoresSafeArea(edges: .top)
     }
     
-    // 主页核心内容 (剔除了 CarouselWidget)
     private var homeScrollContent: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
@@ -106,25 +88,37 @@ struct ContentView: View {
                 
                 VStack(spacing: sectionSpacing) {
                     HStack(alignment: .top, spacing: widgetSpacing) {
-                        CurrentReadingWidget(
-                            heroBook: readingBooks.first,
-                            namespace: namespace,
-                            selectedBook: $selectedBook,
-                            activeCoverID: $activeCoverID,
-                            readingCount: readingBooks.count
-                        )
-                        .frame(maxWidth: .infinity, alignment: .top)
-                        
-                        DashboardWidget()
+                        CurrentReadingWidget(heroBook: readingBooks.first, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID, readingCount: readingBooks.count)
                             .frame(maxWidth: .infinity, alignment: .top)
-                    }
-                    .padding(.bottom, sectionSpacing)
-                }
-                .frame(maxWidth: .infinity)
+                        DashboardWidget().frame(maxWidth: .infinity, alignment: .top)
+                    }.padding(.bottom, sectionSpacing)
+                }.frame(maxWidth: .infinity)
             }
             .padding(.horizontal, pagePadding)
-            .padding(.top, 120)
+            .padding(.top, 120) // 留足顶部空间给导航栏
         }
-        .ignoresSafeArea(edges: .top)
+        // 这里不需要再写 ignoresSafeArea，因为外层 ZStack 已经打通了！
+    }
+}
+
+// MARK: - 专属组件：右上角灵动岛深浅模式按钮
+private struct ThemeToggleButton: View {
+    @Binding var isDarkMode: Bool
+    @State private var isHovered = false
+    
+    var body: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { isDarkMode.toggle() }
+        }) {
+            Image(systemName: isDarkMode ? "moon.stars.fill" : "sun.max.fill")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(isDarkMode ? .twSky400 : .orange)
+                .frame(width: 40, height: 40)
+                // ✨ 使用你的全局液态圆形玻璃引擎
+                .liquidCircleGlass(isHovered: isHovered, isDark: isDarkMode)
+        }
+        .buttonStyle(.plain)
+        .pointingHand()
+        .onHover { h in withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { isHovered = h } }
     }
 }

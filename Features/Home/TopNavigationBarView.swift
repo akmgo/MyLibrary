@@ -6,7 +6,10 @@ struct TopNavigationBarView: View {
     @Binding var isDarkMode: Bool
     var mainTabNamespace: Namespace.ID
     
-    // ✨ 3D图标已替换为具有空间感的图形图标 "cube.fill"
+    // ✨ 追踪悬浮状态
+    @State private var hoveredTab: String? = nil
+    @State private var isHoveringAdd = false // 追踪添加按钮
+    
     let mainTabs = [
         ("阅读主页", "house.fill"),
         ("全景画廊", "square.grid.2x2.fill"),
@@ -17,14 +20,17 @@ struct TopNavigationBarView: View {
     
     var body: some View {
         ZStack {
+            // ================= 1. 绝对居中的主导航 =================
             HStack(spacing: 0) {
                 ForEach(mainTabs, id: \.0) { tab in
                     let title = tab.0
                     let icon = tab.1
                     let isActive = currentMainTab == title
+                    let isHovered = hoveredTab == title
                     
                     let activeTextColor = isDarkMode ? Color.white : Color.twSlate900
                     let inactiveTextColor = isDarkMode ? Color.twSlate400 : Color.twSlate500
+                    let hoverTextColor = isDarkMode ? Color.white.opacity(0.85) : Color.twSlate700
                     
                     Button(action: {
                         withAnimation(.spring(response: 0.35, dampingFraction: 0.6, blendDuration: 0.2)) {
@@ -40,40 +46,53 @@ struct TopNavigationBarView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: icon)
                                     .font(.system(size: 15, weight: isActive ? .bold : .medium))
-                                    .scaleEffect(isActive ? 1.05 : 1.0)
                                 Text(title)
                                     .font(.system(size: 14, weight: .bold))
                             }
-                            .foregroundColor(isActive ? activeTextColor : inactiveTextColor)
+                            .foregroundColor(isActive ? activeTextColor : (isHovered ? hoverTextColor : inactiveTextColor))
+                            .scaleEffect((isHovered || isActive) ? 1.05 : 1.0)
                             .shadow(color: .black.opacity(isActive && isDarkMode ? 0.3 : 0), radius: 2, y: 1)
                         }
                         .frame(height: 44).frame(maxWidth: .infinity).contentShape(Capsule())
                     }
-                    .buttonStyle(.plain).pointingHand()
+                    .buttonStyle(.plain)
+                    .pointingHand()
+                    .onHover { h in
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { hoveredTab = h ? title : nil }
+                    }
                 }
             }
-            .padding(6).frame(width: 660)
+            .padding(6)
+            .frame(width: 660)
             .liquidGlass(cornerRadius: 100, isDark: isDarkMode)
             
-            HStack(alignment: .center) {
-                Button(action: {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { isDarkMode.toggle() }
-                }) {
-                    Image(systemName: isDarkMode ? "moon.stars.fill" : "sun.max.fill")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(isDarkMode ? .twSky400 : .orange)
-                        .frame(width: 50, height: 50)
-                        .liquidGlass(cornerRadius: 25, isDark: isDarkMode)
-                }
-                .buttonStyle(.plain).pointingHand()
-                
+            // ================= 2. 右侧对齐的录入新书按钮 =================
+            HStack {
                 Spacer()
                 
-                HomeAddBookButton {
+                Button(action: {
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { showAddModal = true }
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 14, weight: .bold))
+                        Text("录入新书")
+                            .font(.system(size: 13, weight: .bold))
+                    }
+                    .foregroundColor(isDarkMode ? .white : .twSlate800)
+                    .brightness(isHoveringAdd ? (isDarkMode ? 0.2 : -0.2) : 0)
+                    .scaleEffect(isHoveringAdd ? 1.05 : 1.0)
+                    .padding(.horizontal, 20)
+                    // ✨ 保持高度 44，与中间导航栏完美等高协调
+                    .frame(height: 44)
+                    .liquidGlass(cornerRadius: 22, isDark: isDarkMode)
                 }
+                .buttonStyle(.plain).pointingHand()
+                .onHover { h in withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { isHoveringAdd = h } }
             }
         }
-        .padding(.horizontal, 30).padding(.top, 20).padding(.bottom, 24)
+        // ✨ 设置两边边距，让 Add 按钮留在右侧但不会紧贴屏幕边缘
+        .padding(.horizontal, 40)
+        .padding(.top, 60)
     }
 }

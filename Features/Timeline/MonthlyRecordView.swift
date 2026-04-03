@@ -12,29 +12,31 @@ struct MonthlyRecordView: View {
         
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 24) {
-                // 顶部标题控制
+                // ================= 顶部标题与液态控制按钮 =================
                 HStack(alignment: .center, spacing: 16) {
-                    Button(action: { changeMonth(by: -1) }) {
-                        Image(systemName: "chevron.left").font(.system(size: 16, weight: .bold)).foregroundColor(isDark ? .twSlate400 : .twSlate500).frame(width: 36, height: 36).background(isDark ? Color.twSlate800.opacity(0.8) : Color.white).clipShape(Circle()).shadow(color: .black.opacity(isDark ? 0.2 : 0.05), radius: 4, y: 2)
-                    }.buttonStyle(.plain).pointingHand()
+                    MonthlyNavButton(icon: "chevron.left") { changeMonth(by: -1) }
                     
-                    Text(formattedYearMonth(currentDate)).font(.system(size: 28, weight: .black, design: .rounded)).foregroundColor(isDark ? .white : .twSlate800).frame(width: 150)
+                    Text(formattedYearMonth(currentDate))
+                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .foregroundColor(isDark ? .white : .twSlate800)
+                        .frame(width: 220)
                     
-                    Button(action: { changeMonth(by: 1) }) {
-                        Image(systemName: "chevron.right").font(.system(size: 16, weight: .bold)).foregroundColor(isDark ? .twSlate400 : .twSlate500).frame(width: 36, height: 36).background(isDark ? Color.twSlate800.opacity(0.8) : Color.white).clipShape(Circle()).shadow(color: .black.opacity(isDark ? 0.2 : 0.05), radius: 4, y: 2)
-                    }.buttonStyle(.plain).pointingHand()
+                    MonthlyNavButton(icon: "chevron.right") { changeMonth(by: 1) }
                     
-                    Rectangle().fill(LinearGradient(colors: [isDark ? Color.twIndigo500 : Color.twIndigo400, .clear], startPoint: .leading, endPoint: .trailing)).frame(height: 2).padding(.leading, 12)
+                    Rectangle()
+                        .fill(LinearGradient(colors: [isDark ? Color.twIndigo500 : Color.twIndigo400, .clear], startPoint: .leading, endPoint: .trailing))
+                        .frame(height: 2)
+                        .padding(.leading, 12)
                 }
                 .padding(.horizontal, 32).padding(.top, 32)
                 
+                // ================= 星期与网格 =================
                 HStack(spacing: 0) {
                     ForEach(daysOfWeek, id: \.self) { day in
                         Text(day).font(.system(size: 14, weight: .bold)).foregroundColor(isDark ? .twSlate400 : .twSlate500).frame(maxWidth: .infinity)
                     }
                 }.padding(.horizontal, 32)
                 
-                // 日历网格
                 let columns = Array(repeating: GridItem(.flexible(), spacing: 20), count: 7)
                 let daysInMonth = extractDaysInMonth(for: currentDate)
                 
@@ -54,7 +56,7 @@ struct MonthlyRecordView: View {
             .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 32, style: .continuous).stroke(isDark ? Color.twSlate700.opacity(0.5) : Color.white, lineWidth: 1))
             .shadow(color: .black.opacity(isDark ? 0.3 : 0.05), radius: 30, y: 15)
-            .padding(.horizontal, 40).padding(.top, 120).padding(.bottom, 80)
+            .padding(.horizontal, 40).padding(.top, 200).padding(.bottom, 80)
         }
         .ignoresSafeArea(edges: .top)
     }
@@ -85,7 +87,32 @@ struct MonthlyRecordView: View {
     }
 }
 
-// 专属私有日历卡片
+// MARK: - ✨ 新增：月度专属液态玻璃按钮
+private struct MonthlyNavButton: View {
+    let icon: String
+    let action: () -> Void
+    
+    @State private var isHovered = false
+    @Environment(\.colorScheme) var colorScheme
+    
+    var body: some View {
+        let isDark = colorScheme == .dark
+        
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(isDark ? .white : .twSlate700)
+                .scaleEffect(isHovered ? 1.15 : 1.0)
+                .frame(width: 44, height: 44) // 放大触控区，手感更好
+                .liquidCircleGlass(isHovered: isHovered, isDark: isDark)
+        }
+        .buttonStyle(.plain)
+        .pointingHand()
+        .onHover { h in withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { isHovered = h } }
+    }
+}
+
+// MARK: - 专属私有日历卡片 (已修复卡顿 BUG)
 private struct DayCardView: View {
     let date: Date; let records: [ReadingRecord]; let isDark: Bool
     let cardSize = CGSize(width: 160, height: 240)
@@ -101,6 +128,7 @@ private struct DayCardView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(hasRead ? Color.twIndigo500 : (isDark ? Color.twSlate800 : Color.twSlate300), lineWidth: hasRead ? 1.5 : 1)
             
             if let record = dayRecord, let book = record.book {
+                // ✨ 修复：使用高性能 book 传参
                 LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 16).fill(LinearGradient(colors: [.clear, .white.opacity(0.3), .clear], startPoint: .topLeading, endPoint: .bottomTrailing)))

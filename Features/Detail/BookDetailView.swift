@@ -17,6 +17,8 @@ struct BookDetailView: View {
     @State private var showDeleteAlert = false
     @State private var showAddExcerptSheet = false
     
+    @State private var isHoveredTheme = false
+    
     var body: some View {
         ZStack {
             // ================= 1. 瞬间覆盖的背景层 =================
@@ -60,10 +62,35 @@ struct BookDetailView: View {
                     }
                     .zIndex(999)
                 }
-                .padding(40)
+                .padding(.horizontal, 40).padding(.bottom, 40).padding(.top, 80)
                 .zIndex(999)
             }
             .zIndex(999)
+            .ignoresSafeArea(edges: .top)
+            
+            // ================= 3. ✨ 专属注入：详情页全局深浅色切换按钮 =================
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { isDarkMode.toggle() }
+                    }) {
+                        Image(systemName: isDarkMode ? "moon.stars.fill" : "sun.max.fill")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(isDarkMode ? .twSky400 : .orange)
+                            .frame(width: 40, height: 40)
+                            .liquidCircleGlass(isHovered: isHoveredTheme, isDark: isDarkMode)
+                    }
+                    .buttonStyle(.plain)
+                    .pointingHand()
+                    .onHover { h in withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { isHoveredTheme = h } }
+                }
+                Spacer()
+            }
+            .padding(.top, 10)
+            .padding(.trailing, 10)
+            .opacity(showContent ? 1 : 0) // ✨ 伴随详情页的内容一起丝滑淡入
+            .zIndex(1000) // 赋予详情页内部的最高层级，绝对不会被遮挡！
             
             // ================= 3. ✨ 编辑书籍弹窗引擎 =================
             if showEditSheet {
@@ -92,8 +119,7 @@ struct BookDetailView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity).zIndex(1001)
             }
-            
-        }
+         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
             withAnimation(.easeOut(duration: 0.15)) { showBackground = true }
@@ -117,11 +143,13 @@ struct BookDetailView: View {
     }
 }
 
-// 预览 Wrapper
+/// 预览 Wrapper
 struct BookDetailPreviewWrapper: View {
     let book: Book
     @Namespace var namespace
     @State var selectedBook: Book? = nil
     @State var activeCoverID: String = "preview"
-    var body: some View { BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook) }
+    var body: some View {
+        BookDetailView(book: book, namespace: namespace, activeCoverID: $activeCoverID, selectedBook: $selectedBook)
+    }
 }

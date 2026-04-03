@@ -7,6 +7,7 @@ struct MyLibraryApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(.hiddenTitleBar)
         .defaultSize(width: 1400, height: 950)
         #if os(macOS)
         // 允许用户自由缩放窗口，设置一个最小体验尺寸

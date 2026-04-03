@@ -4,6 +4,9 @@ import SwiftUI
 struct YearReadingCard: View {
     let count: Int
     @State private var isHovered = false
+    
+    // ✨ 引入滚轮动画专属的独立状态
+    @State private var displayCount: Int = 0
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -24,9 +27,18 @@ struct YearReadingCard: View {
                 Spacer()
 
                 HStack(alignment: .bottom, spacing: 6) {
-                    Text("\(count)").font(.system(size: 72, weight: .black, design: .rounded))
-                        .foregroundStyle(LinearGradient(colors: [.primary, .twIndigo500], startPoint: .top, endPoint: .bottom))
+                    // ✨ 核心 1：数字滚轮跳转 + 悬浮渐变变色 + 弹簧起飞
+                    Text("\(displayCount)")
+                        .font(.system(size: 72, weight: .black, design: .rounded))
+                        // 悬浮时，从沉稳的原色瞬间点亮为极其通透的品牌渐变色
+                        .foregroundStyle(isHovered ? AnyShapeStyle(LinearGradient(colors: [.twIndigo400, .twPurple500], startPoint: .topLeading, endPoint: .bottomTrailing)) : AnyShapeStyle(Color.primary))
                         .shadow(color: Color.twIndigo500.opacity(isHovered ? 0.4 : 0), radius: 15, x: 0, y: 10)
+                        // 赋予物理上的浮空感
+                        .offset(y: isHovered ? -6 : 0)
+                        // 开启数字滚动过渡引擎
+                        .contentTransition(.numericText())
+                        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isHovered)
+
                     Text("本").font(.system(size: 18, weight: .black)).foregroundColor(.twIndigo500.opacity(0.6)).padding(.bottom, 15)
                 }
                 .frame(maxWidth: .infinity, alignment: .center).scaleEffect(isHovered ? 1.05 : 1.0)
@@ -36,7 +48,16 @@ struct YearReadingCard: View {
             .padding(24)
         }
         .innerGlassCardStyle(isHovered: isHovered)
-        .onHover { h in withAnimation(.spring()) { isHovered = h } }
+        .onHover { h in withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { isHovered = h } }
+        // ✨ 当卡片出现在屏幕上时，数字从 0 飞速滚到实际数值
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { displayCount = count }
+            }
+        }
+        .onChange(of: count) { _, newCount in
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { displayCount = newCount }
+        }
     }
 }
 
@@ -44,6 +65,9 @@ struct YearReadingCard: View {
 struct MonthReadingCard: View {
     let days: Int
     @State private var isHovered = false
+    
+    // ✨ 引入滚轮动画专属的独立状态
+    @State private var displayDays: Int = 0
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -64,9 +88,15 @@ struct MonthReadingCard: View {
                 Spacer()
 
                 HStack(alignment: .bottom, spacing: 6) {
-                    Text("\(days)").font(.system(size: 72, weight: .black, design: .rounded))
-                        .foregroundStyle(LinearGradient(colors: [.primary, .twEmerald500], startPoint: .top, endPoint: .bottom))
+                    // ✨ 核心 1：数字滚轮跳转 + 悬浮渐变变色 + 弹簧起飞
+                    Text("\(displayDays)")
+                        .font(.system(size: 72, weight: .black, design: .rounded))
+                        .foregroundStyle(isHovered ? AnyShapeStyle(LinearGradient(colors: [.twEmerald400, .twTeal600], startPoint: .topLeading, endPoint: .bottomTrailing)) : AnyShapeStyle(Color.primary))
                         .shadow(color: Color.twEmerald500.opacity(isHovered ? 0.4 : 0), radius: 15, x: 0, y: 10)
+                        .offset(y: isHovered ? -6 : 0)
+                        .contentTransition(.numericText())
+                        .animation(.spring(response: 0.4, dampingFraction: 0.6), value: isHovered)
+
                     Text("天").font(.system(size: 18, weight: .black)).foregroundColor(.twEmerald500.opacity(0.6)).padding(.bottom, 15)
                 }
                 .frame(maxWidth: .infinity, alignment: .center).scaleEffect(isHovered ? 1.05 : 1.0)
@@ -76,7 +106,15 @@ struct MonthReadingCard: View {
             .padding(24)
         }
         .innerGlassCardStyle(isHovered: isHovered)
-        .onHover { h in withAnimation(.spring()) { isHovered = h } }
+        .onHover { h in withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { isHovered = h } }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { displayDays = days }
+            }
+        }
+        .onChange(of: days) { _, newDays in
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { displayDays = newDays }
+        }
     }
 }
 
@@ -119,7 +157,9 @@ struct WeeklyEnergyMatrix: View {
                         
                         VStack(spacing: 12) {
                             Text(days[index]).font(.system(size: 12, weight: .black)).foregroundColor(isToday ? (isActive ? .twSky500 : .twOrange500) : (isDark ? .twSlate500 : .twSlate400))
-                            EnergyBlock(isActive: isActive, isToday: isToday)
+                            
+                            // ✨ 核心 2：把外层卡片的 Hover 状态传给每个小方块
+                            EnergyBlock(isActive: isActive, isToday: isToday, isParentHovered: isHovered)
                         }
                         .frame(maxWidth: .infinity)
                     }
@@ -129,7 +169,7 @@ struct WeeklyEnergyMatrix: View {
             .padding(.vertical, 24)
         }
         .innerGlassCardStyle(isHovered: isHovered)
-        .onHover { h in withAnimation(.spring()) { isHovered = h } }
+        .onHover { h in withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) { isHovered = h } }
     }
 }
 
@@ -137,11 +177,14 @@ struct WeeklyEnergyMatrix: View {
 private struct EnergyBlock: View {
     let isActive: Bool
     let isToday: Bool
+    let isParentHovered: Bool // ✨ 接收外层指令
+    
     @Environment(\.colorScheme) var colorScheme
     @State private var isPulsing = false
     
     var body: some View {
         let isDark = colorScheme == .dark
+        
         ZStack {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(isActive ? AnyShapeStyle(LinearGradient(colors: [isDark ? Color.twSky500 : Color.twSky400, isDark ? Color.twSky700 : Color.twSky600], startPoint: .top, endPoint: .bottom)) : (isToday ? AnyShapeStyle(isDark ? Color.twSlate800 : Color.twSlate100) : AnyShapeStyle(isDark ? Color.twSlate800.opacity(0.5) : Color.twSlate200.opacity(0.5))))
@@ -167,8 +210,11 @@ private struct EnergyBlock: View {
                 .opacity(isToday && !isActive ? (isPulsing ? 1.0 : 0.4) : 1.0)
         }
         .frame(width: 44, height: 48)
-        .shadow(color: isActive ? Color.twSky500.opacity(0.4) : .clear, radius: 8, x: 0, y: 5)
-        .scaleEffect(isActive ? 1.05 : 1.0)
+        // ✨ 当代表“今天”的方块遇到外层卡片 Hover 时：向上跳起并放大！
+        .offset(y: (isToday && isParentHovered) ? -8 : 0)
+        .scaleEffect(isActive ? 1.05 : ((isToday && isParentHovered) ? 1.15 : 1.0))
+        .shadow(color: (isToday && isParentHovered) ? Color.twOrange500.opacity(0.4) : (isActive ? Color.twSky500.opacity(0.4) : .clear), radius: (isToday && isParentHovered) ? 12 : 8, x: 0, y: (isToday && isParentHovered) ? 8 : 5)
+        .animation(.spring(response: 0.35, dampingFraction: 0.5), value: isParentHovered)
         .onAppear { if isToday && !isActive { withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { isPulsing = true } } }
     }
 }
