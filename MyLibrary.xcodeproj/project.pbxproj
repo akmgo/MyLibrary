@@ -149,9 +149,117 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C53E9E442F7F5EFB0022A698 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				C53E9E452F7F5F1A0022A698 /* Data */,
+				C582E1AA2F7B65F700C95473 /* Models */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		C53E9E452F7F5F1A0022A698 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				C582E1E32F7BBDFD00C95473 /* PreviewData.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		C53E9E462F7F5F5B0022A698 /* UIComponents */ = {
+			isa = PBXGroup;
+			children = (
+				C53E9E4E2F7F61080022A698 /* Sheets */,
+				C53E9E492F7F5FCE0022A698 /* Visuals */,
+				C53E9E482F7F5FA30022A698 /* Controls */,
+				C53E9E472F7F5F6B0022A698 /* Modifiers */,
+			);
+			path = UIComponents;
+			sourceTree = "<group>";
+		};
+		C53E9E472F7F5F6B0022A698 /* Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				C53E9E342F7E89EE0022A698 /* LiquidGlassModifier.swift */,
+				C582E1B02F7B66CF00C95473 /* View+GlassEffect.swift.swift */,
+				C53E9E3E2F7EAF640022A698 /* LiquidSheetModifier.swift */,
+				C53E9E382F7EA0860022A698 /* LiquidButtonModifier.swift */,
+				C5DCF76F2F7C1D1E00428041 /* View+GlassStyle.swift */,
+			);
+			path = Modifiers;
+			sourceTree = "<group>";
+		};
+		C53E9E482F7F5FA30022A698 /* Controls */ = {
+			isa = PBXGroup;
+			children = (
+				C53E9E3C2F7EAD9B0022A698 /* CustomTextField.swift */,
+				C53E9E322F7E81C30022A698 /* AnimatedButtons.swift */,
+				C582E1E62F7BC53000C95473 /* CheckInButton.swift */,
+			);
+			path = Controls;
+			sourceTree = "<group>";
+		};
+		C53E9E492F7F5FCE0022A698 /* Visuals */ = {
+			isa = PBXGroup;
+			children = (
+				C53E9E362F7E8B930022A698 /* FluidBackgroundView.swift */,
+				C582E1CB2F7B77F300C95473 /* LocalCoverView.swift */,
+			);
+			path = Visuals;
+			sourceTree = "<group>";
+		};
+		C53E9E4A2F7F60060022A698 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				C53E9E4D2F7F608F0022A698 /* Timeline */,
+				C53E9E4C2F7F60710022A698 /* Carousel */,
+				C53E9E4B2F7F601F0022A698 /* Home */,
+				C582E1B72F7B67A900C95473 /* Archive */,
+				C582E1B92F7B67CD00C95473 /* Detail */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		C53E9E4B2F7F601F0022A698 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */,
+				C582E1D82F7BA57200C95473 /* DashboardWidget.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		C53E9E4C2F7F60710022A698 /* Carousel */ = {
+			isa = PBXGroup;
+			children = (
+				C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */,
+				C5DCF76D2F7BCD8D00428041 /* CarouselCardItem.swift */,
+			);
+			path = Carousel;
+			sourceTree = "<group>";
+		};
+		C53E9E4D2F7F608F0022A698 /* Timeline */ = {
+			isa = PBXGroup;
+			children = (
+				C582E1BE2F7B6B2800C95473 /* YearlyTimelineView.swift */,
+			);
+			path = Timeline;
+			sourceTree = "<group>";
+		};
+		C53E9E4E2F7F61080022A698 /* Sheets */ = {
+			isa = PBXGroup;
+			children = (
+				C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */,
+				C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */,
+			);
+			path = Sheets;
+			sourceTree = "<group>";
+		};
 		C582E1742F7B655400C95473 = {
 			isa = PBXGroup;
 			children = (
+				C53E9E462F7F5F5B0022A698 /* UIComponents */,
+				C53E9E442F7F5EFB0022A698 /* Core */,
 				C582E1D22F7B82A700C95473 /* Resources */,
 				C582E1D12F7B828300C95473 /* ViewModels */,
 				C582E1D02F7B826B00C95473 /* Services */,
@@ -159,7 +267,6 @@
 				C582E1C22F7B6DEE00C95473 /* Utils */,
 				C582E1AD2F7B662700C95473 /* Components */,
 				C582E1AB2F7B660500C95473 /* Views */,
-				C582E1AA2F7B65F700C95473 /* Models */,
 				C582E17F2F7B655400C95473 /* MyLibrary */,
 				C582E18F2F7B655500C95473 /* MyLibraryTests */,
 				C582E1992F7B655500C95473 /* MyLibraryUITests */,
@@ -190,8 +297,7 @@
 		C582E1AB2F7B660500C95473 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C582E1B92F7B67CD00C95473 /* Detail */,
-				C582E1B72F7B67A900C95473 /* Archive */,
+				C53E9E4A2F7F60060022A698 /* Features */,
 				C582E1B42F7B677200C95473 /* Main */,
 			);
 			path = Views;
@@ -201,7 +307,6 @@
 			isa = PBXGroup;
 			children = (
 				C582E1B22F7B66FA00C95473 /* BookCardView.swift */,
-				C582E1CB2F7B77F300C95473 /* LocalCoverView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -217,7 +322,6 @@
 		C582E1B72F7B67A900C95473 /* Archive */ = {
 			isa = PBXGroup;
 			children = (
-				C582E1BE2F7B6B2800C95473 /* YearlyTimelineView.swift */,
 				C582E1B82F7B67B600C95473 /* ArchiveGalleryView.swift */,
 				C53E9DCE2F7D01770022A698 /* GalleryBookCardView.swift */,
 				C53E9E422F7F4E800022A698 /* MonthlyRecordView.swift */,
@@ -238,17 +342,6 @@
 		C582E1C22F7B6DEE00C95473 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				C582E1E32F7BBDFD00C95473 /* PreviewData.swift */,
-				C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */,
-				C5DCF76F2F7C1D1E00428041 /* View+GlassStyle.swift */,
-				C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */,
-				C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */,
-				C53E9E322F7E81C30022A698 /* AnimatedButtons.swift */,
-				C53E9E342F7E89EE0022A698 /* LiquidGlassModifier.swift */,
-				C53E9E362F7E8B930022A698 /* FluidBackgroundView.swift */,
-				C53E9E382F7EA0860022A698 /* LiquidButtonModifier.swift */,
-				C53E9E3C2F7EAD9B0022A698 /* CustomTextField.swift */,
-				C53E9E3E2F7EAF640022A698 /* LiquidSheetModifier.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -256,7 +349,7 @@
 		C582E1CD2F7B824000C95473 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				C582E1B02F7B66CF00C95473 /* View+GlassEffect.swift.swift */,
+				C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -290,9 +383,6 @@
 				C582E1E52F7BC50700C95473 /* Dashboard */,
 				C582E1DC2F7BB30F00C95473 /* CurrentReading */,
 				C582E1D42F7BA55800C95473 /* HeaderView.swift */,
-				C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */,
-				C582E1D82F7BA57200C95473 /* DashboardWidget.swift */,
-				C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -310,7 +400,6 @@
 		C582E1E52F7BC50700C95473 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
-				C582E1E62F7BC53000C95473 /* CheckInButton.swift */,
 				C582E1EA2F7BC54D00C95473 /* WeeklyEnergyMatrix.swift */,
 				C582E1EE2F7BC64000C95473 /* YearReadingCard.swift */,
 				C582E1F02F7BC65B00C95473 /* MonthReadingCard.swift */,
@@ -321,7 +410,6 @@
 		C5DCF76C2F7BCD7C00428041 /* Carousel */ = {
 			isa = PBXGroup;
 			children = (
-				C5DCF76D2F7BCD8D00428041 /* CarouselCardItem.swift */,
 			);
 			path = Carousel;
 			sourceTree = "<group>";

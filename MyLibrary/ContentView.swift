@@ -30,6 +30,7 @@ struct ContentView: View {
     let mainTabs = [
         ("阅读主页", "house.fill"),
         ("全景画廊", "square.grid.2x2.fill"),
+        ("3D漫游", "view.3d"), // ✨ 新增的 3D 展览模块
         ("年度轨迹", "timelapse"),
         ("月度记录", "calendar")
     ]
@@ -47,6 +48,17 @@ struct ContentView: View {
                         homeScrollContent
                     case "全景画廊":
                         ArchiveGalleryView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
+                    case "3D漫游": // ✨ 新增单独的 3D 页面封装
+                        ZStack {
+                            if allBooks.isEmpty {
+                                Text("暂无书籍，去主页录入第一本吧").foregroundColor(.twSlate500)
+                            } else {
+                                CarouselWidget(books: allBooks)
+                                    // 让它在全屏居中显示
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            }
+                        }
+                        .padding(.top, 100) // 避开顶部导航栏
                     case "年度轨迹":
                         YearlyTimelineView(books: allBooks, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
                     case "月度记录":
@@ -100,6 +112,7 @@ struct ContentView: View {
     }
     
     // MARK: - 拆分：置顶悬浮导航条
+
     private var globalTopNavBar: some View {
         ZStack {
             HStack(spacing: 0) {
@@ -168,6 +181,7 @@ struct ContentView: View {
     }
     
     // MARK: - 拆分：原版阅读主页滚动内容
+
     private var homeScrollContent: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
@@ -188,11 +202,6 @@ struct ContentView: View {
                             .frame(maxWidth: .infinity, alignment: .top)
                     }
                     .padding(.bottom, sectionSpacing)
-                    
-                    if !allBooks.isEmpty {
-                        CarouselWidget(books: allBooks)
-                            .padding(.bottom, 80)
-                    }
                 }
                 .frame(maxWidth: .infinity)
             }
