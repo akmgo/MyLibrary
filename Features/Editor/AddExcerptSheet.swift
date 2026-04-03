@@ -43,7 +43,8 @@ struct AddExcerptSheet: View {
                         .scrollContentBackground(.hidden)
                 }
                 .frame(height: 220)
-                .liquidInput(isDark: isDark, cornerRadius: 16)
+                // ✨ 这里替换为接入全局的 AppleRadius.regular
+                .liquidInput(radius: AppleRadius.regular, isDark: isDark)
                 .padding(.horizontal, 36)
                 
                 Spacer()

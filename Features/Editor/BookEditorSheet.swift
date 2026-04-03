@@ -76,8 +76,9 @@ struct BookEditorSheet: View {
                         if let data = selectedCoverData {
                             LocalCoverView(coverData: data, fallbackTitle: titleInput.isEmpty ? "暂无书名" : titleInput)
                                 .frame(width: 160, height: 240)
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                .overlay(RoundedRectangle(cornerRadius: 16).stroke(.white.opacity(0.2), lineWidth: 0.5))
+                                // ✨ 替换为 AppleCurve 全局小圆角 (16)
+                                .appleClip(radius: AppleRadius.regular)
+                                .appleBorder(.white.opacity(0.2), radius: AppleRadius.regular, lineWidth: 0.5)
                                 .shadow(color: .black.opacity(0.2), radius: 15, y: 10)
                         } else {
                             DashedDropzoneView(isDark: isDark)
@@ -191,10 +192,11 @@ private struct DashedDropzoneView: View {
     var isDark: Bool
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            // ✨ 替换为 AppleCurve 全局小圆角 (16)
+            RoundedRectangle(cornerRadius: AppleRadius.regular, style: .continuous)
                 .stroke(isDark ? Color.twIndigo500.opacity(0.4) : Color.twIndigo400.opacity(0.5), style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
                 .background(isDark ? Color.twIndigo900.opacity(0.1) : Color.twIndigo50.opacity(0.3))
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .appleClip(radius: AppleRadius.regular)
             VStack(spacing: 12) {
                 Image(systemName: "icloud.and.arrow.up").font(.system(size: 32, weight: .light)).foregroundColor(.twIndigo400)
                 VStack(spacing: 4) {

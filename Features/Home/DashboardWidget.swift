@@ -84,6 +84,7 @@ struct DashboardWidget: View {
                     .frame(height: 170)
             }.padding(40)
         }
+        .padding(20)
         .outerGlassBlockStyle()
         .onAppear {
             hasCheckedIn = allRecords.contains { Calendar.current.isDate($0.date, inSameDayAs: Date()) }

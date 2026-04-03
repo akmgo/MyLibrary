@@ -100,6 +100,11 @@ struct BookDetailView: View {
                         .transition(.opacity).zIndex(1)
                     
                     BookEditorSheet(isPresented: $showEditSheet, bookToEdit: book)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                        )
                         .transition(.asymmetric(insertion: .scale(scale: 0.9).combined(with: .opacity), removal: .scale(scale: 0.9).combined(with: .opacity)))
                         .zIndex(2)
                 }
@@ -114,12 +119,17 @@ struct BookDetailView: View {
                         .transition(.opacity).zIndex(1)
                     
                     AddExcerptSheet(isPresented: $showAddExcerptSheet, book: book)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                        )
                         .transition(.asymmetric(insertion: .scale(scale: 0.9).combined(with: .opacity), removal: .scale(scale: 0.9).combined(with: .opacity)))
                         .zIndex(2)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity).zIndex(1001)
             }
-         }
+        }
         .navigationBarBackButtonHidden(true)
         .onAppear {
             withAnimation(.easeOut(duration: 0.15)) { showBackground = true }

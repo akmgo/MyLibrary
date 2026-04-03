@@ -31,6 +31,7 @@
 		C582E1DB2F7BA58000C95473 /* CarouselWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */; };
 		C582E1E42F7BBDFD00C95473 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1E32F7BBDFD00C95473 /* PreviewData.swift */; };
 		C582E1F32F7BC6CC00C95473 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */; };
+		C5D3BE9E2F7FF98B00418802 /* AppleBooksDBUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D3BE9D2F7FF98B00418802 /* AppleBooksDBUtils.swift */; };
 		C5DCF7742F7CCF0C00428041 /* BookExcerptsView.swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DCF7732F7CCF0C00428041 /* BookExcerptsView.swift.swift */; };
 /* End PBXBuildFile section */
 
@@ -79,6 +80,7 @@
 		C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselWidget.swift; sourceTree = "<group>"; };
 		C582E1E32F7BBDFD00C95473 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
+		C5D3BE9D2F7FF98B00418802 /* AppleBooksDBUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleBooksDBUtils.swift; sourceTree = "<group>"; };
 		C5DCF7732F7CCF0C00428041 /* BookExcerptsView.swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookExcerptsView.swift.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -231,6 +233,7 @@
 		C582E1742F7B655400C95473 = {
 			isa = PBXGroup;
 			children = (
+				C5D3BE9C2F7FF95F00418802 /* Utils */,
 				C53E9E462F7F5F5B0022A698 /* UIComponents */,
 				C53E9E442F7F5EFB0022A698 /* Core */,
 				C582E1D22F7B82A700C95473 /* Resources */,
@@ -296,6 +299,14 @@
 				C582E1862F7B655500C95473 /* Assets.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		C5D3BE9C2F7FF95F00418802 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				C5D3BE9D2F7FF98B00418802 /* AppleBooksDBUtils.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -466,6 +477,7 @@
 				C582E1C82F7B6F2900C95473 /* YearlyTimelineView.swift in Sources */,
 				C582E1CC2F7B77F300C95473 /* LocalCoverView.swift in Sources */,
 				C53E9E2F2F7E4D370022A698 /* BookEditorSheet.swift in Sources */,
+				C5D3BE9E2F7FF98B00418802 /* AppleBooksDBUtils.swift in Sources */,
 				C582E1F32F7BC6CC00C95473 /* Color+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -623,9 +635,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "拾光书阁";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -668,9 +679,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "拾光书阁";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;

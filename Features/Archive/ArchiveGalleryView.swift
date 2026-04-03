@@ -62,11 +62,11 @@ struct ArchiveGalleryView: View {
                         ForEach(tabs, id: \.0) { tab in
                             let isActive = activeTab == tab.0
                             let isHovered = hoveredTab == tab.0
-                                                
+                                                                            
                             let activeColor = isDark ? Color.white : Color.twSlate900
                             let inactiveColor = isDark ? Color.twSlate400 : Color.twSlate500
                             let hoverColor = isDark ? Color.white.opacity(0.85) : Color.twSlate700
-                                                
+                                                                            
                             Button(action: {
                                 withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { activeTab = tab.0 }
                                 updateDisplayBooks(animate: true)
@@ -74,11 +74,12 @@ struct ArchiveGalleryView: View {
                                 ZStack {
                                     // ✨ 同样去掉了灰底，保持极简
                                     if isActive {
-                                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        // ✨ 替换为 AppleRadius.small
+                                        RoundedRectangle(cornerRadius: AppleRadius.small, style: .continuous)
                                             .fill(isDark ? Color.white.opacity(0.15) : Color.black.opacity(0.08))
                                             .matchedGeometryEffect(id: "gallery-tab", in: tabNamespace)
                                     }
-                                                        
+                                                                                        
                                     Text(tab.1).font(.system(size: 13, weight: .bold))
                                         // ✨ 悬浮时字体提亮
                                         .foregroundColor(isActive ? activeColor : (isHovered ? hoverColor : inactiveColor))
@@ -94,7 +95,8 @@ struct ArchiveGalleryView: View {
                         }
                     }
                     .padding(4).frame(width: 200)
-                    .liquidGlass(cornerRadius: 16, isDark: isDark)
+                    // ✨ 替换为 AppleRadius.regular 及其新参数名
+                    .liquidGlass(radius: AppleRadius.regular, isDark: isDark)
                 }
                 .padding(.horizontal, 10)
                 

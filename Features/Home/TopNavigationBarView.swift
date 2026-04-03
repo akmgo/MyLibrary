@@ -64,7 +64,8 @@ struct TopNavigationBarView: View {
             }
             .padding(6)
             .frame(width: 660)
-            .liquidGlass(cornerRadius: 100, isDark: isDarkMode)
+            // ✨ 适配新版引擎的 radius 参数 (保留 100 以渲染完美的大胶囊体)
+            .liquidGlass(radius: 100, isDark: isDarkMode)
             
             // ================= 2. 右侧对齐的录入新书按钮 =================
             HStack {
@@ -85,7 +86,8 @@ struct TopNavigationBarView: View {
                     .padding(.horizontal, 20)
                     // ✨ 保持高度 44，与中间导航栏完美等高协调
                     .frame(height: 44)
-                    .liquidGlass(cornerRadius: 22, isDark: isDarkMode)
+                    // ✨ 适配新版引擎的 radius 参数 (保留 22 以完美渲染高度为 44 的标准胶囊)
+                    .liquidGlass(radius: 22, isDark: isDarkMode)
                 }
                 .buttonStyle(.plain).pointingHand()
                 .onHover { h in withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) { isHoveringAdd = h } }
