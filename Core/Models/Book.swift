@@ -17,6 +17,7 @@ final class Book {
     var startTime: Date?
     var endTime: Date?
     var progress: Int = 0
+    var isWantToRead: Bool = false
     
     @Relationship(deleteRule: .cascade) var excerpts: [Excerpt]? = []
     @Relationship(deleteRule: .cascade) var reading_record: [ReadingRecord]? = []
@@ -30,7 +31,8 @@ final class Book {
          tags: [String] = [],
          startTime: Date? = nil,
          endTime: Date? = nil,
-         progress: Int = 0)
+         progress: Int = 0,
+         isWantToRead: Bool = false)
     {
         self.id = id
         self.title = title
@@ -42,5 +44,6 @@ final class Book {
         self.startTime = startTime
         self.endTime = endTime
         self.progress = progress
+        self.isWantToRead = false
     }
 }

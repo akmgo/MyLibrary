@@ -181,32 +181,68 @@ struct ContentView: View {
     private var homeScrollContent: some View {
             ScrollView(.vertical, showsIndicators: false) {
                 
-                // ✨ 魔法 1：最外层增加一个霸占全部屏幕宽度的 VStack，它会默认把它内部的所有内容居中！
-                VStack {
+                VStack(spacing: 24) {
                     
-                    // 内部的对齐逻辑：保持内容左对齐（让 Header 和卡片左边缘对齐）
-                    VStack(alignment: .leading, spacing: 0) {
-                        HeaderView().padding(.bottom, 20)
-                        
-                        VStack(spacing: sectionSpacing) {
-                            HStack(alignment: .top, spacing: widgetSpacing) {
-                                CurrentReadingWidget(heroBook: readingBooks.first, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID, readingCount: readingBooks.count)
-                                    .frame(maxWidth: .infinity, alignment: .top)
-                                
-                                DashboardWidget()
-                                    .frame(maxWidth: .infinity, alignment: .top)
-                            }
-                            .padding(.bottom, sectionSpacing)
-                        }
+                    // ✨ 图书馆与格言头部
+                    HStack {
+                        HeaderView()
+                        Spacer()
                     }
-                    // ✨ 魔法 2：把 1280 的最大宽度限制，挂在这个内部的内容块上
-                    .frame(maxWidth: 1380)
+                    .padding(.bottom, 10)
+                    
+                    // ================= 第一排：聚焦与当下 (60% / 40%) =================
+                    HStack(spacing: 24) {
+                        if let heroBook = readingBooks.first {
+                            ReadingCard(
+                                book: heroBook,
+                                progress: Double(heroBook.progress),
+                                isDark: isDarkMode,
+                                namespace: namespace,
+                                selectedBook: $selectedBook,
+                                activeCoverID: $activeCoverID
+                            )
+                            // ✨ 统一高度 220
+                            .frame(width: 600, height: 220)
+                        } else {
+                            VStack {
+                                Text("暂无在读焦点").font(.system(size: 14, weight: .bold)).foregroundColor(.twSlate500)
+                            }
+                            .frame(width: 600, height: 220) // ✨ 统一高度 220
+                            .background(.ultraThinMaterial)
+                            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        }
+                        
+                        DashboardWidget()
+                            .frame(width: 376, height: 220) // ✨ 统一高度 220
+                    }
+                    
+                    // ================= 第二排：灵魂与数据 (40% / 60%) =================
+                    HStack(spacing: 24) {
+                        MomentumChartCard()
+                            .frame(width: 376, height: 220) // ✨ 统一高度 220
+                        
+                        ResonanceWaveChart()
+                            .frame(width: 600, height: 220) // ✨ 统一高度 220
+                    }
+                    
+                    // ================= 第三排：行动与足迹 (50% / 50%) =================
+                    HStack(spacing: 24) {
+                        QueueBookshelfChart()
+                            .frame(width: 488, height: 220) // ✨ 统一高度 220
+                        
+                        YearlyHeatmapCard()
+                            .frame(width: 488, height: 220) // ✨ 统一高度 220
+                    }
+                    
+                    // ================= 第四排：横贯全局的通栏 =================
+                    KnowledgeSpectrumCard()
+                        .frame(width: 1000, height: 160) // ✨ 统一高度 220 (原为 160，现在拉高，内部会自动垂直居中)
                     
                 }
-                .frame(maxWidth: .infinity) // <-- 强制外层容器撑满屏幕
-                .padding(.horizontal, pagePadding)
-                .padding(.top, 120)
-                
+                .frame(width: 1000) // 锁死内容区总宽度
+                .frame(maxWidth: .infinity) // 让它在全屏居中
+                .padding(.bottom, sectionSpacing)
+                .padding(.top, 100)
             }
         }
 }

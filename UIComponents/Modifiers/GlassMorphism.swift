@@ -41,45 +41,52 @@ public extension View {
 
 // MARK: - 2. 动态流体光影引擎 (满屏覆盖版)
 
+@available(macOS 15.0, iOS 18.0, *)
 struct FluidBackgroundView: View {
     var isDark: Bool
-    @State private var move = false
 
     var body: some View {
-        GeometryReader { geo in
-            let w = geo.size.width
-            let h = geo.size.height
-
-            ZStack {
-                (self.isDark ? Color.twSlate950 : Color.twSlate50).ignoresSafeArea()
-
-                Circle()
-                    .fill(LinearGradient(colors: [.twIndigo400, .twPurple500], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .opacity(self.isDark ? 0.35 : 0.25)
-                    .frame(width: w * 1.2, height: w * 1.2)
-                    .blur(radius: 150)
-                    .offset(x: self.move ? -w * 0.1 : w * 0.3, y: self.move ? -h * 0.2 : h * 0.2)
-
-                Circle()
-                    .fill(LinearGradient(colors: [.twSky300, .twIndigo300], startPoint: .leading, endPoint: .trailing))
-                    .opacity(self.isDark ? 0.3 : 0.2)
-                    .frame(width: w * 1.5, height: w * 1.5)
-                    .blur(radius: 180)
-                    .offset(x: self.move ? w * 0.4 : -w * 0.2, y: self.move ? h * 0.3 : -h * 0.1)
-
-                Circle()
-                    .fill(Color.twFuchsia400)
-                    .opacity(self.isDark ? 0.2 : 0.15)
-                    .frame(width: w * 1.0, height: w * 1.0)
-                    .blur(radius: 150)
-                    .offset(x: self.move ? w * 0.1 : w * 0.4, y: self.move ? -h * 0.1 : h * 0.5)
-            }
+        // 闭包里只保留最简单的调用，绝不给编译器增加负担
+        TimelineView(.animation) { timeline in
+            self.animatedMesh(date: timeline.date)
         }
-        .ignoresSafeArea()
         .allowsHitTesting(false)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 8).repeatForever(autoreverses: true)) { self.move.toggle() }
-        }
+    }
+
+    /// ✨ 核心修复：把渲染逻辑完全抽离到一个明确返回 `some View` 的独立函数中
+    private func animatedMesh(date: Date) -> some View {
+        // 1. 计算时间与坐标
+        let time = Float(date.timeIntervalSinceReferenceDate) * 0.2
+        let xOffset = 0.2 * sin(time)
+        let yOffset = 0.2 * cos(time * 0.8)
+        let centerPoint = SIMD2<Float>(0.5 + xOffset, 0.5 + yOffset)
+
+        // 2. 准备颜色矩阵
+        let darkColors: [Color] = [
+            Color.twSlate950, Color.twIndigo900, Color.twSlate950,
+            Color.twPurple900, Color.twSky900, Color.twFuchsia900,
+            Color.twSlate950, Color.twIndigo950, Color.twSlate950
+        ]
+
+        let lightColors: [Color] = [
+            Color.twSlate50, Color.twIndigo200, Color.twSlate50,
+            Color.twPurple200, Color.twSky300, Color.twFuchsia300,
+            Color.twSlate50, Color.twIndigo200, Color.twSlate50
+        ]
+
+        // 3. 返回网格渐变
+        return MeshGradient(
+            width: 3,
+            height: 3,
+            points: [
+                .init(0, 0), .init(0.5, 0), .init(1, 0),
+                .init(0, 0.5), centerPoint, .init(1, 0.5),
+                .init(0, 1), .init(0.5, 1), .init(1, 1)
+            ],
+            colors: self.isDark ? darkColors : lightColors
+        )
+        .ignoresSafeArea()
+        .opacity(self.isDark ? 0.35 : 0.3)
     }
 }
 
@@ -186,6 +193,20 @@ extension View {
             .scaleEffect(isHovered ? 1.02 : 1.0)
             .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isHovered)
     }
+
+    /// ✨ 主页专属静态悬浮卡片 (仅保留基座质感，移除整体悬浮动态)
+    func homeStaticGlassCardStyle(outerRadius: CGFloat = AppleRadius.hero, paddingToOuter: CGFloat = 8) -> some View {
+        let radius = AppleRadius.nested(outer: outerRadius, padding: paddingToOuter)
+
+        return self
+            .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
+            .background(.regularMaterial)
+            .appleClip(radius: radius)
+            // 保持静止态的微弱高光边框
+            .appleBorder(Color.white.opacity(0.15), radius: radius, lineWidth: 1)
+            // 保持静止态四周包围的均匀弥散感 (y = 0)
+            .shadow(color: Color.black.opacity(0.25), radius: 20, x: 0, y: 0)
+    }
 }
 
 // MARK: - 4. 鼠标交互与 3D 特效
@@ -211,11 +232,9 @@ private struct TiltCardModifier: ViewModifier {
             // 🚀 1. 3D 倾斜
             .rotation3DEffect(.degrees(self.rotationX), axis: (x: 1, y: 0, z: 0), perspective: 1.0)
             .rotation3DEffect(.degrees(self.rotationY), axis: (x: 0, y: 1, z: 0), perspective: 1.0)
-            
             // 🚀 2. 靠近镜头感与阴影 (只跟随 isHovered 变化)
             .scaleEffect(self.isHovered ? 1.02 : 1.0)
             .shadow(color: Color.black.opacity(self.isHovered ? 0.2 : 0), radius: self.isHovered ? 30 : 0, x: 0, y: self.isHovered ? 15 : 0)
-            
             // ✨ 优化点 1：把悬浮状态独立出来！确保进出时只触发一次，动画绝不被打断
             .onHover { hovering in
                 // 这里的动画专门为放大和阴影服务，更加舒缓

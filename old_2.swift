@@ -32,12 +32,10 @@ struct BookDossierView: View {
             VStack(spacing: 40) {
                 HStack(alignment: .top, spacing: 60) {
                     // 👉 左侧：封面降落区
-                    // 👉 左侧：封面降落区
                     ZStack {
                         Circle().fill(Color.twIndigo500.opacity(0.2)).frame(width: 220, height: 220).blur(radius: 40).offset(y: 20).opacity(showContent ? 1 : 0)
-                                            
+                        
                         LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
-                            // ✨ 核心修复：1. 先圆角 2.再匹配 3.最后 Frame，和起飞卡片一模一样！
                             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                             .matchedGeometryEffect(id: activeCoverID, in: namespace)
                             .frame(width: 260, height: 390)
@@ -51,9 +49,7 @@ struct BookDossierView: View {
                             .zIndex(999)
                             .shadow(color: .black.opacity(showContent ? (isHovered ? 0.6 : 0.3) : 0), radius: isHovered ? 40 : 20, y: isHovered ? 25 : 12)
                     }
-                    .frame(width: 260, height: 390)
-                    .tiltCardEffect() // 恢复你的 3D 倾斜效果
-                    .zIndex(999)
+                    .frame(width: 260, height: 390).tiltCardEffect().zIndex(999)
                     
                     // 👉 右侧：表单控制交互区
                     VStack(alignment: .leading, spacing: 0) {
@@ -205,7 +201,6 @@ struct BookDossierView: View {
 }
 
 // MARK: - 专属私有组件 (避免污染全局命名空间)
-
 private struct DateSelectorButton: View {
     let icon: String
     let title: String

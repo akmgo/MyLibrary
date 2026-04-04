@@ -9,8 +9,12 @@ struct GalleryBookCardView: View {
     let activeCoverID: String
     let selectedBook: Book?
     
+    var onHoverColorChange: ((Color?) -> Void)? = nil
+    
     @Environment(\.colorScheme) var colorScheme
     @State private var isHovered = false
+    
+    @State private var ambientColor: Color = .twIndigo500
     
     let ratingTexts = ["", "一星毒草", "二星平庸", "三星粮草", "四星推荐", "🔥 改变人生"]
     
@@ -36,7 +40,10 @@ struct GalleryBookCardView: View {
             // ✨ 1. 精准的系统级弧度边框：严格跟随封面同样的 AppleRadius.regular 弧线！
             .appleBorder(isHovered ? Color.white.opacity(0.6) : (isDark ? Color.white.opacity(0.15) : Color.black.opacity(0.05)), radius: AppleRadius.regular, lineWidth: 1)
             // ✨ 2. 四周发散的大阴影，只投射在封面底下
-            .shadow(color: Color.black.opacity(isHovered ? 0.35 : 0.15), radius: isHovered ? 30 : 10, x: 0, y: isHovered ? 15 : 5)
+            .shadow(color: isHovered ? ambientColor.opacity(isDark ? 0.6 : 0.4) : Color.black.opacity(0.15),
+                    radius: isHovered ? 35 : 10,
+                    x: 0,
+                    y: isHovered ? 15 : 5)
             // ✨ 3. 物理脱离感：仅仅封面升空并放大，下方的文字不改变位置
             .offset(y: isHovered ? -8 : 0)
             .scaleEffect(isHovered ? 1.03 : 1.0)
@@ -67,13 +74,25 @@ struct GalleryBookCardView: View {
         }
         .contentShape(Rectangle())
         // ✨ 将悬浮检测区域挂在整个 VStack 上，但仅封面做视觉变化
-        .onHover { h in isHovered = h }
+        .onHover { h in
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.65)) { isHovered = h }
+            onHoverColorChange?(h ? ambientColor : nil)}
+        // ✨ 当卡片出现时，异步非阻塞地提取颜色
+        .task(id: book.id) {
+            let color = await CoverColorExtractor.shared.getDominantColor(from: book.coverData, id: book.id)
+            // 提取完毕后平滑过渡
+            withAnimation(.easeInOut(duration: 0.5)) {
+                self.ambientColor = color
+                if self.isHovered { self.onHoverColorChange?(color) }
+            }
+        }
         .pointingHand()
         .zIndex(selectedBook?.id == book.id ? 999 : 0)
     }
 }
 
 // MARK: - 专属私有组件：极简战报区
+
 private struct GalleryStatsView: View {
     let book: Book
     let isDark: Bool

@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C535BB882F80DD7C007003B2 /* CoverColorExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB872F80DD7C007003B2 /* CoverColorExtractor.swift */; };
+		C535BB8A2F80EEF2007003B2 /* ImageCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB892F80EEF2007003B2 /* ImageCacheManager.swift */; };
+		C535BB8E2F80F77B007003B2 /* ReadingCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB8D2F80F77B007003B2 /* ReadingCard.swift */; };
+		C535BB902F80FD8E007003B2 /* DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB8F2F80FD8E007003B2 /* DashboardWidget.swift */; };
+		C535BB9A2F81534C007003B2 /* ResonanceWaveChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB992F81534C007003B2 /* ResonanceWaveChart.swift */; };
+		C535BB9C2F81537C007003B2 /* QueueBookshelfChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB9B2F81537C007003B2 /* QueueBookshelfChart.swift */; };
+		C535BB9E2F8155E7007003B2 /* MomentumChartCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB9D2F8155E7007003B2 /* MomentumChartCard.swift */; };
+		C535BBA02F8156F0007003B2 /* KnowledgeSpectrumCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BB9F2F8156F0007003B2 /* KnowledgeSpectrumCard.swift */; };
+		C535BBA22F81572B007003B2 /* YearlyHeatmapCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535BBA12F81572B007003B2 /* YearlyHeatmapCard.swift */; };
 		C53E9DCF2F7D01770022A698 /* GalleryBookCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9DCE2F7D01770022A698 /* GalleryBookCardView.swift */; };
 		C53E9E2F2F7E4D370022A698 /* BookEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */; };
 		C53E9E312F7E5B2B0022A698 /* AddExcerptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */; };
@@ -15,8 +24,6 @@
 		C53E9E432F7F4E800022A698 /* MonthlyRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E422F7F4E800022A698 /* MonthlyRecordView.swift */; };
 		C53E9E602F7F6BCA0022A698 /* TopNavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E5F2F7F6BCA0022A698 /* TopNavigationBarView.swift */; };
 		C53E9E622F7F6E030022A698 /* GlassMorphism.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E612F7F6E030022A698 /* GlassMorphism.swift */; };
-		C53E9E642F7F7AE70022A698 /* DashboardStatCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E632F7F7AE70022A698 /* DashboardStatCards.swift */; };
-		C53E9E662F7F7B0B0022A698 /* CurrentReadingComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53E9E652F7F7B0B0022A698 /* CurrentReadingComponents.swift */; };
 		C582E1872F7B655500C95473 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C582E1862F7B655500C95473 /* Assets.xcassets */; };
 		C582E1BB2F7B690D00C95473 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1AE2F7B665200C95473 /* Book.swift */; };
 		C582E1BC2F7B692000C95473 /* Excerpt.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1AF2F7B668100C95473 /* Excerpt.swift */; };
@@ -26,8 +33,6 @@
 		C582E1CA2F7B6F3400C95473 /* BookDossierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1BD2F7B6AB400C95473 /* BookDossierView.swift */; };
 		C582E1CC2F7B77F300C95473 /* LocalCoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1CB2F7B77F300C95473 /* LocalCoverView.swift */; };
 		C582E1D52F7BA55800C95473 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1D42F7BA55800C95473 /* HeaderView.swift */; };
-		C582E1D72F7BA56400C95473 /* CurrentReadingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */; };
-		C582E1D92F7BA57200C95473 /* DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1D82F7BA57200C95473 /* DashboardWidget.swift */; };
 		C582E1DB2F7BA58000C95473 /* CarouselWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */; };
 		C582E1E42F7BBDFD00C95473 /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1E32F7BBDFD00C95473 /* PreviewData.swift */; };
 		C582E1F32F7BC6CC00C95473 /* Color+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */; };
@@ -53,6 +58,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C535BB872F80DD7C007003B2 /* CoverColorExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverColorExtractor.swift; sourceTree = "<group>"; };
+		C535BB892F80EEF2007003B2 /* ImageCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCacheManager.swift; sourceTree = "<group>"; };
+		C535BB8D2F80F77B007003B2 /* ReadingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingCard.swift; sourceTree = "<group>"; };
+		C535BB8F2F80FD8E007003B2 /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
+		C535BB992F81534C007003B2 /* ResonanceWaveChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResonanceWaveChart.swift; sourceTree = "<group>"; };
+		C535BB9B2F81537C007003B2 /* QueueBookshelfChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueBookshelfChart.swift; sourceTree = "<group>"; };
+		C535BB9D2F8155E7007003B2 /* MomentumChartCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MomentumChartCard.swift; sourceTree = "<group>"; };
+		C535BB9F2F8156F0007003B2 /* KnowledgeSpectrumCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeSpectrumCard.swift; sourceTree = "<group>"; };
+		C535BBA12F81572B007003B2 /* YearlyHeatmapCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyHeatmapCard.swift; sourceTree = "<group>"; };
 		C53E9DCE2F7D01770022A698 /* GalleryBookCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GalleryBookCardView.swift; sourceTree = "<group>"; };
 		C53E9E2E2F7E4D370022A698 /* BookEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookEditorSheet.swift; sourceTree = "<group>"; };
 		C53E9E302F7E5B2B0022A698 /* AddExcerptSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExcerptSheet.swift; sourceTree = "<group>"; };
@@ -61,8 +75,6 @@
 		C53E9E422F7F4E800022A698 /* MonthlyRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthlyRecordView.swift; sourceTree = "<group>"; };
 		C53E9E5F2F7F6BCA0022A698 /* TopNavigationBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopNavigationBarView.swift; sourceTree = "<group>"; };
 		C53E9E612F7F6E030022A698 /* GlassMorphism.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassMorphism.swift; sourceTree = "<group>"; };
-		C53E9E632F7F7AE70022A698 /* DashboardStatCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardStatCards.swift; sourceTree = "<group>"; };
-		C53E9E652F7F7B0B0022A698 /* CurrentReadingComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentReadingComponents.swift; sourceTree = "<group>"; };
 		C582E17D2F7B655400C95473 /* MyLibrary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyLibrary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C582E1862F7B655500C95473 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C582E18C2F7B655500C95473 /* MyLibraryTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyLibraryTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,8 +87,6 @@
 		C582E1BE2F7B6B2800C95473 /* YearlyTimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearlyTimelineView.swift; sourceTree = "<group>"; };
 		C582E1CB2F7B77F300C95473 /* LocalCoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCoverView.swift; sourceTree = "<group>"; };
 		C582E1D42F7BA55800C95473 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
-		C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentReadingWidget.swift; sourceTree = "<group>"; };
-		C582E1D82F7BA57200C95473 /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
 		C582E1DA2F7BA58000C95473 /* CarouselWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarouselWidget.swift; sourceTree = "<group>"; };
 		C582E1E32F7BBDFD00C95473 /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		C582E1F22F7BC6CC00C95473 /* Color+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extension.swift"; sourceTree = "<group>"; };
@@ -196,10 +206,13 @@
 			children = (
 				C582E1D42F7BA55800C95473 /* HeaderView.swift */,
 				C53E9E5F2F7F6BCA0022A698 /* TopNavigationBarView.swift */,
-				C582E1D62F7BA56400C95473 /* CurrentReadingWidget.swift */,
-				C582E1D82F7BA57200C95473 /* DashboardWidget.swift */,
-				C53E9E632F7F7AE70022A698 /* DashboardStatCards.swift */,
-				C53E9E652F7F7B0B0022A698 /* CurrentReadingComponents.swift */,
+				C535BB8D2F80F77B007003B2 /* ReadingCard.swift */,
+				C535BB8F2F80FD8E007003B2 /* DashboardWidget.swift */,
+				C535BB992F81534C007003B2 /* ResonanceWaveChart.swift */,
+				C535BB9B2F81537C007003B2 /* QueueBookshelfChart.swift */,
+				C535BB9D2F8155E7007003B2 /* MomentumChartCard.swift */,
+				C535BB9F2F8156F0007003B2 /* KnowledgeSpectrumCard.swift */,
+				C535BBA12F81572B007003B2 /* YearlyHeatmapCard.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -305,6 +318,8 @@
 			isa = PBXGroup;
 			children = (
 				C5D3BE9D2F7FF98B00418802 /* AppleBooksDBUtils.swift */,
+				C535BB872F80DD7C007003B2 /* CoverColorExtractor.swift */,
+				C535BB892F80EEF2007003B2 /* ImageCacheManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -455,27 +470,32 @@
 			buildActionMask = 2147483647;
 			files = (
 				C582E1E42F7BBDFD00C95473 /* PreviewData.swift in Sources */,
+				C535BB9C2F81537C007003B2 /* QueueBookshelfChart.swift in Sources */,
+				C535BBA22F81572B007003B2 /* YearlyHeatmapCard.swift in Sources */,
 				C53E9E622F7F6E030022A698 /* GlassMorphism.swift in Sources */,
 				C53E9E432F7F4E800022A698 /* MonthlyRecordView.swift in Sources */,
-				C582E1D72F7BA56400C95473 /* CurrentReadingWidget.swift in Sources */,
-				C582E1D92F7BA57200C95473 /* DashboardWidget.swift in Sources */,
+				C535BB882F80DD7C007003B2 /* CoverColorExtractor.swift in Sources */,
 				C582E1CA2F7B6F3400C95473 /* BookDossierView.swift in Sources */,
 				C582E1D52F7BA55800C95473 /* HeaderView.swift in Sources */,
+				C535BB9A2F81534C007003B2 /* ResonanceWaveChart.swift in Sources */,
+				C535BB8E2F80F77B007003B2 /* ReadingCard.swift in Sources */,
 				C5DCF7742F7CCF0C00428041 /* BookExcerptsView.swift.swift in Sources */,
 				C53E9DCF2F7D01770022A698 /* GalleryBookCardView.swift in Sources */,
 				C53E9E412F7F4DEE0022A698 /* ReadingRecord.swift in Sources */,
 				C582E1BB2F7B690D00C95473 /* Book.swift in Sources */,
 				C582E1DB2F7BA58000C95473 /* CarouselWidget.swift in Sources */,
-				C53E9E662F7F7B0B0022A698 /* CurrentReadingComponents.swift in Sources */,
+				C535BB9E2F8155E7007003B2 /* MomentumChartCard.swift in Sources */,
 				C582E1C72F7B6F2300C95473 /* ArchiveGalleryView.swift in Sources */,
 				C582E1BC2F7B692000C95473 /* Excerpt.swift in Sources */,
+				C535BBA02F8156F0007003B2 /* KnowledgeSpectrumCard.swift in Sources */,
 				C53E9E602F7F6BCA0022A698 /* TopNavigationBarView.swift in Sources */,
-				C53E9E642F7F7AE70022A698 /* DashboardStatCards.swift in Sources */,
+				C535BB8A2F80EEF2007003B2 /* ImageCacheManager.swift in Sources */,
 				C53E9E312F7E5B2B0022A698 /* AddExcerptSheet.swift in Sources */,
 				C53E9E332F7E81C30022A698 /* AnimatedButtons.swift in Sources */,
 				C582E1C92F7B6F2F00C95473 /* BookDetailView.swift in Sources */,
 				C582E1C82F7B6F2900C95473 /* YearlyTimelineView.swift in Sources */,
 				C582E1CC2F7B77F300C95473 /* LocalCoverView.swift in Sources */,
+				C535BB902F80FD8E007003B2 /* DashboardWidget.swift in Sources */,
 				C53E9E2F2F7E4D370022A698 /* BookEditorSheet.swift in Sources */,
 				C5D3BE9E2F7FF98B00418802 /* AppleBooksDBUtils.swift in Sources */,
 				C582E1F32F7BC6CC00C95473 /* Color+Extension.swift in Sources */,

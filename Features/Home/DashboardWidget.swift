@@ -1,12 +1,20 @@
 import SwiftUI
 import SwiftData
+import Charts
 
+// MARK: - 🍏 极简 Swift Charts 框架版：时光健身环 (真实数据库直连版)
 struct DashboardWidget: View {
     @Environment(\.colorScheme) var colorScheme
+    @State private var isHovered = false
+    
+    // ✨ 注入全局数据库
     @Query var allBooks: [Book]
     @Query var allRecords: [ReadingRecord]
     
-    @State private var hasCheckedIn = false
+    // 🎯 目标设定 (后续可以抽到 AppStorage 让用户自行设置)
+    let yearTarget = 50.0
+    let monthTarget = 30.0
+    let weekTarget = 7.0
     
     // ================== 🧠 数据库联合计算中枢 ==================
     var yearlyCount: Int {
@@ -31,75 +39,143 @@ struct DashboardWidget: View {
         return uniqueDays.count
     }
     
-    var weeklyData: (matrix: [Bool], count: Int) {
+    var weekCount: Int {
         var calendar = Calendar.current
-        calendar.firstWeekday = 2
+        calendar.firstWeekday = 2 // 周一作为第一天
         let today = Date()
-        guard let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)) else {
-            return (Array(repeating: false, count: 7), 0)
-        }
+        guard let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)) else { return 0 }
         
-        var matrix = Array(repeating: false, count: 7)
         var count = 0
         for i in 0..<7 {
             if let dayDate = calendar.date(byAdding: .day, value: i, to: startOfWeek) {
                 let hasRecord = allRecords.contains { calendar.isDate($0.date, inSameDayAs: dayDate) }
-                matrix[i] = hasRecord
                 if hasRecord { count += 1 }
             }
         }
-        return (matrix, count)
-    }
-    
-    var todayIndex: Int {
-        var calendar = Calendar.current
-        calendar.firstWeekday = 2
-        let weekday = calendar.component(.weekday, from: Date())
-        return (weekday + 5) % 7
+        return count
     }
     // =======================================================
     
+    @State private var animatedWeek: Double = 0.0
+    @State private var animatedMonth: Double = 0.0
+    @State private var animatedYear: Double = 0.0
+    
+    let ringOuterSize: CGFloat = 160
+    let ringWidth: CGFloat = 18
+    let ringSpacing: CGFloat = 2
+    
     var body: some View {
         let isDark = colorScheme == .dark
+        let colorRed = isDark ? Color(red: 0.90, green: 0.25, blue: 0.40) : Color(red: 0.80, green: 0.15, blue: 0.30)
+        let colorGreen = isDark ? Color(red: 0.35, green: 0.80, blue: 0.45) : Color(red: 0.15, green: 0.65, blue: 0.30)
+        let colorBlue = isDark ? Color(red: 0.25, green: 0.75, blue: 0.95) : Color(red: 0.10, green: 0.55, blue: 0.80)
         
-        ZStack {
-            // 背景光晕
-            GeometryReader { geo in
-                Circle().fill(isDark ? Color.twBlue600.opacity(0.1) : Color.twBlue300.opacity(0.3)).frame(width: 500, height: 500).blur(radius: 100).position(x: 0, y: 0)
-                Circle().fill(isDark ? Color.twPurple600.opacity(0.1) : Color.twPurple300.opacity(0.3)).frame(width: 400, height: 400).blur(radius: 100).position(x: geo.size.width, y: geo.size.height)
-            }.allowsHitTesting(false)
-            
-            VStack(spacing: 15) {
-                // 1. 标题栏 (去掉了多余的 .padding(.horizontal, 4))
-                HStack {
-                    Text("阅读看板").font(.system(size: 24, weight: .regular)).foregroundColor(isDark ? .white : .twSlate800)
-                    Spacer()
-                    CheckInButton(hasCheckedIn: $hasCheckedIn)
-                }
-                .frame(height: 44)
-                
-                // 2. 中间卡片
-                HStack(spacing: 24) {
-                    YearReadingCard(count: yearlyCount)
-                    MonthReadingCard(days: monthlyDays)
-                }.frame(height: 180)
-                
-                // ✨ 魔法 2：利用 Spacer 将热力图强行推到最底部
-                Spacer(minLength: 0)
-                
-                // 3. 底部卡片
-                WeeklyEnergyMatrix(continuousDays: weeklyData.count, weekData: weeklyData.matrix, todayIndex: todayIndex)
-                    .frame(height:200)
+        let ringMiddleSize = ringOuterSize - (ringWidth * 2) - (ringSpacing * 2)
+        let ringInnerSize = ringMiddleSize - (ringWidth * 2) - (ringSpacing * 2)
+        
+        HStack(spacing: 36) {
+            ZStack {
+                ChartFitnessRing(progress: animatedWeek / weekTarget, size: ringOuterSize, width: ringWidth, color: colorRed, icon: "arrow.right", isDark: isDark)
+                ChartFitnessRing(progress: animatedMonth / monthTarget, size: ringMiddleSize, width: ringWidth, color: colorGreen, icon: "chevron.right.2", isDark: isDark)
+                ChartFitnessRing(progress: animatedYear / yearTarget, size: ringInnerSize, width: ringWidth, color: colorBlue, icon: "arrow.up.right", isDark: isDark)
             }
-            // ✨ 魔法 1：全局只保留这一个极其标准的内边距，统一四周间距
-            .padding(30)
+            .padding(.leading, 20)
+            
+            // 👉 文字排版直接绑定静态计算结果
+            VStack(alignment: .leading, spacing: 24) {
+                FitnessTextRow(current: weekCount, target: Int(weekTarget), unit: "天", color: colorRed)
+                FitnessTextRow(current: monthlyDays, target: Int(monthTarget), unit: "天", color: colorGreen)
+                FitnessTextRow(current: yearlyCount, target: Int(yearTarget), unit: "卷", color: colorBlue)
+            }
+            Spacer(minLength: 0)
         }
-        // ✨ 魔法 3：让卡片高度自适应拉伸，配合隔壁的卡片保持等高
-        .frame(maxHeight: .infinity)
-        .outerGlassBlockStyle()
+        .padding(.vertical, 30)
+        .frame(height: 220)
+        .homeStaticGlassCardStyle()
+        .contentShape(Rectangle())
         .onAppear {
-            hasCheckedIn = allRecords.contains { Calendar.current.isDate($0.date, inSameDayAs: Date()) }
+            animatedWeek = Double(weekCount)
+            animatedMonth = Double(monthlyDays)
+            animatedYear = Double(yearlyCount)
+        }
+        // ✨ 当数据库有新数据时，圆环自动向前推进！
+        .onChange(of: weekCount) { _, new in withAnimation { animatedWeek = Double(new) } }
+        .onChange(of: monthlyDays) { _, new in withAnimation { animatedMonth = Double(new) } }
+        .onChange(of: yearlyCount) { _, new in withAnimation { animatedYear = Double(new) } }
+        .onHover { h in
+            isHovered = h
+            if h {
+                withAnimation(nil) {
+                    animatedWeek = 0; animatedMonth = 0; animatedYear = 0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    withAnimation(.spring(response: 0.8, dampingFraction: 0.75)) {
+                        animatedWeek = Double(weekCount)
+                        animatedMonth = Double(monthlyDays)
+                        animatedYear = Double(yearlyCount)
+                    }
+                }
+            } else {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    animatedWeek = Double(weekCount)
+                    animatedMonth = Double(monthlyDays)
+                    animatedYear = Double(yearlyCount)
+                }
+            }
         }
     }
 }
 
+// MARK: - ⭕️ 纯 Swift Charts 框架构建的圆环 (保持不变)
+private struct ChartFitnessRing: View {
+    let progress: Double; let size: CGFloat; let width: CGFloat
+    let color: Color; let icon: String; let isDark: Bool
+    
+    var body: some View {
+        let validProgress = min(max(progress, 0), 1.0)
+        let leftProgress = 1.0 - validProgress
+        
+        ZStack {
+            Chart {
+                SectorMark(angle: .value("Total", 1.0), innerRadius: .inset(width), outerRadius: .inset(0))
+                    .foregroundStyle(color.opacity(isDark ? 0.15 : 0.1))
+            }
+            .chartXAxis(.hidden).chartYAxis(.hidden)
+            
+            Chart {
+                SectorMark(angle: .value("Done", validProgress), innerRadius: .inset(width), outerRadius: .inset(0))
+                    .foregroundStyle(color.gradient)
+                    .cornerRadius(width / 2)
+                
+                SectorMark(angle: .value("Left", leftProgress), innerRadius: .inset(width), outerRadius: .inset(0))
+                    .foregroundStyle(.clear)
+            }
+            .chartXAxis(.hidden).chartYAxis(.hidden)
+            
+            ZStack {
+                Circle().fill(color).frame(width: width - 2, height: width - 2)
+                Image(systemName: icon)
+                    .font(.system(size: width * 0.55, weight: .black))
+                    .foregroundColor(isDark ? .black : .white.opacity(0.95))
+            }
+            .offset(y: -size / 2 + width / 2)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+// MARK: - 📝 视觉子组件：纯净数据排版 (保持不变)
+private struct FitnessTextRow: View {
+    let current: Int; let target: Int; let unit: String; let color: Color
+    
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text("\(current)/\(target)")
+                .font(.system(size: 28, weight: .black, design: .rounded))
+            Text(unit)
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .opacity(0.8)
+        }
+        .foregroundColor(color)
+    }
+}

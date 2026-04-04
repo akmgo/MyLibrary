@@ -79,4 +79,24 @@ extension Color {
 
     /// Fuchsia (洋红系列补充)
     static let twFuchsia600 = Color(hex: "c026d3")
+
+    /// Tailwind Purple 200 (#e9d5ff) - 用于浅色模式下的柔和紫光
+    static let twPurple200 = Color(red: 233/255, green: 213/255, blue: 255/255)
+
+    /// Tailwind Purple 900 (#581c87) - 用于深色模式下的深邃紫底
+    static let twPurple900 = Color(red: 88/255, green: 28/255, blue: 135/255)
+
+    /// Tailwind Fuchsia 900 (#701a75) - 用于深色模式下的暗粉色能量点
+    static let twFuchsia900 = Color(red: 112/255, green: 26/255, blue: 117/255)
+
+    /// Tailwind Sky 900 (#0c4a6e) - 用于深色模式下的深海蓝过渡
+    static let twSky900 = Color(red: 12/255, green: 74/255, blue: 110/255)
+
+    /// Tailwind Purple 800 (#6b21a8) - 介于 700 和 900 之间，非常饱满的深紫色
+    static let twPurple800 = Color(red: 107/255, green: 33/255, blue: 168/255)
+
+    /// Tailwind Fuchsia 800 (#86198f) - 带有强烈品红倾向的深暗色，用来做霓虹暗光绝佳
+    static let twFuchsia800 = Color(red: 134/255, green: 25/255, blue: 143/255)
+    /// Tailwind Fuchsia 700 (#a21caf) - 极具活力的亮品红色，适合做高光、进度条或热力图高频点
+        static let twFuchsia700 = Color(red: 162/255, green: 28/255, blue: 175/255)
 }

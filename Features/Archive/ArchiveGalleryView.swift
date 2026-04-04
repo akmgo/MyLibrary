@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 
 // MARK: - ✨ 全局画廊布局配置
+
 public enum GalleryConfig {
     /// 封面真实宽度
     public static let coverWidth: CGFloat = 200
@@ -19,6 +20,8 @@ struct ArchiveGalleryView: View {
     @Binding var selectedBook: Book?
     @Binding var activeCoverID: String
     
+    @State private var globalAmbientColor: Color = .clear
+    
     @Environment(\.colorScheme) var colorScheme
     @State private var activeTab: String = "ALL"
     @State private var displayBooks: [Book] = []
@@ -29,16 +32,36 @@ struct ArchiveGalleryView: View {
     let topSpacing: CGFloat = 170
     
     var body: some View {
-        ScrollView {
-            gridView
-                .padding(.horizontal, 40)
-                .padding(.top, topSpacing)
-                .padding(.bottom, 60)
+            // ✨ 核心修复：在 body 的最开头声明 isDark
+            let isDark = colorScheme == .dark
+            
+            ZStack {
+                // 🚀 随鼠标悬浮变色的全屏光晕
+                RadialGradient(
+                    colors: [
+                        globalAmbientColor.opacity(isDark ? 0.6 : 0.4),
+                        globalAmbientColor.opacity(isDark ? 0.2 : 0.1),
+                        .clear
+                    ],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 1000
+                )
+                .blendMode(isDark ? .screen : .normal)
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 0.8), value: globalAmbientColor)
+                
+                ScrollView {
+                    gridView
+                        .padding(.horizontal, 40)
+                        .padding(.top, topSpacing)
+                        .padding(.bottom, 60)
+                }
+            }
+            .ignoresSafeArea(edges: .top)
+            .onAppear { updateDisplayBooks(animate: false) }
+            .onChange(of: books) { _, _ in updateDisplayBooks(animate: true) }
         }
-        .ignoresSafeArea(edges: .top)
-        .onAppear { updateDisplayBooks(animate: false) }
-        .onChange(of: books) { _, _ in updateDisplayBooks(animate: true) }
-    }
     
     @ViewBuilder
     private var gridView: some View {
@@ -113,16 +136,19 @@ struct ArchiveGalleryView: View {
                                             isFinishedTab: activeTab == "FINISHED",
                                             namespace: namespace,
                                             activeCoverID: activeCoverID,
-                                            selectedBook: selectedBook)
-                            .onTapGesture {
-                                activeCoverID = "gallery-\(book.id)"
-                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { selectedBook = book }
-                            }
-                            .zIndex(selectedBook?.id == book.id ? 999 : 0)
-                            .transition(.asymmetric(
-                                insertion: .scale(scale: 0.8).combined(with: .opacity).combined(with: .offset(y: 40)),
-                                removal: .scale(scale: 0.8).combined(with: .opacity)
-                            ))
+                                            selectedBook: selectedBook,
+                                            onHoverColorChange: { color in
+                                                globalAmbientColor = color ?? .clear
+                                            })
+                                            .onTapGesture {
+                                                activeCoverID = "gallery-\(book.id)"
+                                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { selectedBook = book }
+                                            }
+                                            .zIndex(selectedBook?.id == book.id ? 999 : 0)
+                                            .transition(.asymmetric(
+                                                insertion: .scale(scale: 0.8).combined(with: .opacity).combined(with: .offset(y: 40)),
+                                                removal: .scale(scale: 0.8).combined(with: .opacity)
+                                            ))
                     }
                 }
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: displayBooks)

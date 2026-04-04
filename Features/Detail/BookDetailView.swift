@@ -144,6 +144,7 @@ struct BookDetailView: View {
         } message: { Text("确定要删除《\(book.title)》吗？相关的读书笔记也会一并清除。") }
     }
     
+    /// ✨ 完全还原成功版本的退出逻辑，完美解决画廊返回缩放畸变问题！
     private func closeDetail() {
         withAnimation(.easeOut(duration: 0.15)) { showContent = false }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
