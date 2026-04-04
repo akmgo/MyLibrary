@@ -22,20 +22,6 @@ struct ReadingCard: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                // 1. 全局弥散背景层
-                GeometryReader { geo in
-                    ZStack {
-                        LocalCoverView(coverData: book.coverData, fallbackTitle: "")
-                            .scaledToFill()
-                            .frame(width: geo.size.width, height: geo.size.height)
-                            .blur(radius: 40)
-                            .opacity(isDark ? 0.15 : 0.06)
-                        
-                        LinearGradient(colors: [ambientColor.opacity(isDark ? 0.15 : 0.05), .clear], startPoint: .leading, endPoint: .trailing)
-                    }
-                }
-                .clipped()
-                
                 // 2. ✨ 核心内容区：三分网格布局 (视觉深度优化)
                 HStack(spacing: 24) {
                     
