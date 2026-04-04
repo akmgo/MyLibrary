@@ -20,33 +20,44 @@ struct CurrentReadingWidget: View {
                 Circle().fill(isDark ? Color.twPurple600.opacity(0.1) : Color.twPurple300.opacity(0.3)).frame(width: 400, height: 400).blur(radius: 100).position(x: geo.size.width, y: geo.size.height)
             }.allowsHitTesting(false)
             
-            VStack(spacing: 24) {
+            VStack(spacing: 15) {
+                // 1. 标题栏 (同样去掉多余的左右边距)
                 HStack {
-                    Text("当前在读").font(.system(size: 24, weight: .black)).foregroundColor(isDark ? .white : .twSlate800)
+                    Text("当前在读").font(.system(size: 24, weight: .regular)).foregroundColor(isDark ? .white : .twSlate800)
                     Spacer()
-                    Text("\(readingCount) 本").font(.system(size: 14, weight: .bold)).foregroundColor(isDark ? .twSlate300 : .twSlate500)
-                }.padding(.horizontal, 4)
+                }
+                .frame(height: 44)
                 
                 if let book = heroBook {
-                    VStack(spacing: 24) {
-                        HStack(spacing: 24) {
-                            HeroBookCard(book: book, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
-                                .frame(maxWidth: .infinity)
-                            
-                            ReadingProgressCard(book: book)
-                                .frame(width: 200)
-                        }
-                        BoomDecorCard()
+                    // 去掉了原先包裹着这些组件且自带 padding(15) 的多余 VStack
+                    HStack(spacing: 24) {
+                        HeroBookCard(book: book, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID)
+                            .frame(maxWidth: .infinity)
+                        
+                        ReadingProgressCard(book: book)
+                            .frame(width: 200)
                     }
+                    
+                    // ✨ 魔法 2：利用 Spacer 将爆点装饰卡片强行推到最底部
+                    Spacer(minLength: 0)
+                    
+                    BoomDecorCard()
+                    
                 } else {
+                    Spacer(minLength: 0)
                     VStack(spacing: 16) {
                         Image(systemName: "book.closed").font(.system(size: 48)).foregroundColor(.twSlate400.opacity(0.3))
                         Text("目前没有正在阅读的书籍").font(.headline).italic().foregroundColor(.twSlate500)
-                    }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    Spacer(minLength: 0)
                 }
             }
-            .padding(40)
+            // ✨ 魔法 1：与数据看板一模一样的内边距 (32)
+            .padding(30)
         }
+        // ✨ 魔法 3：开启高度拉伸，与隔壁数据看板齐平
+        .frame(maxHeight: .infinity)
         .outerGlassBlockStyle()
     }
 }
+

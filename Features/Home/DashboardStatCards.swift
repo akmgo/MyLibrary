@@ -209,7 +209,7 @@ private struct EnergyBlock: View {
                 .shadow(color: isActive ? .white : (isToday ? .twOrange500 : .clear), radius: isActive ? 6 : (isToday ? 5 : 0))
                 .opacity(isToday && !isActive ? (isPulsing ? 1.0 : 0.4) : 1.0)
         }
-        .frame(width: 44, height: 48)
+        .frame(width: 44, height: 70)
         // ✨ 当代表“今天”的方块遇到外层卡片 Hover 时：向上跳起并放大！
         .offset(y: (isToday && isParentHovered) ? -8 : 0)
         .scaleEffect(isActive ? 1.05 : ((isToday && isParentHovered) ? 1.15 : 1.0))

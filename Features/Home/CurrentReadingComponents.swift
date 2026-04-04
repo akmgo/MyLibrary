@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 
 // MARK: - 1. 主英雄封面卡
+
 struct HeroBookCard: View {
     let book: Book
     let namespace: Namespace.ID
@@ -11,16 +12,18 @@ struct HeroBookCard: View {
     
     var body: some View {
         ZStack(alignment: .leading) {
+            // 1. 背景扫光特效 (优化：光泽更柔和)
             GeometryReader { geo in
                 Rectangle()
-                    .fill(LinearGradient(colors: [.clear, .white.opacity(0.4), .clear], startPoint: .leading, endPoint: .trailing))
-                    .frame(width: 100)
-                    .rotationEffect(.degrees(15))
+                    .fill(LinearGradient(colors: [.clear, .white.opacity(0.3), .clear], startPoint: .leading, endPoint: .trailing))
+                    .frame(width: 120)
+                    .rotationEffect(.degrees(20))
                     .offset(x: isHovered ? geo.size.width + 50 : -150)
             }
             .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
             
             HStack(spacing: 24) {
+                // 2. 左侧封面与背光
                 ZStack {
                     Circle()
                         .fill(Color.twIndigo500.opacity(isHovered ? 0.3 : 0.1))
@@ -33,9 +36,11 @@ struct HeroBookCard: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             .matchedGeometryEffect(id: "hero-\(book.id)", in: namespace)
                             .frame(width: 150, height: 200)
+                            // ✨ 封面优化：不仅 3D 旋转，还微微放大靠近镜头，立体感倍增
+                            .scaleEffect(isHovered ? 1.05 : 1.0)
                             .rotation3DEffect(.degrees(isHovered ? 12 : 0), axis: (x: 0, y: 1, z: -0.2), perspective: 0.5)
                             .offset(y: isHovered ? -8 : 0)
-                            .shadow(color: Color.black.opacity(isHovered ? 0.3 : 0.1), radius: isHovered ? 15 : 5, x: 0, y: isHovered ? 10 : 5)
+                            .shadow(color: Color.black.opacity(isHovered ? 0.3 : 0.1), radius: isHovered ? 20 : 8, x: 0, y: isHovered ? 15 : 5)
                     } else {
                         LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -44,34 +49,48 @@ struct HeroBookCard: View {
                     }
                 }
                 
+                // 3. 右侧信息区
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(book.title)
                             .font(.system(size: 26, weight: .black))
                             .foregroundColor(isHovered ? .twIndigo500 : .primary)
                             .lineLimit(2)
+                        
                         Text(book.author)
                             .font(.title3)
                             .fontWeight(.bold)
                             .foregroundColor(.twSlate500)
                             .lineLimit(1)
                     }
-                    .offset(x: isHovered ? 8 : 0)
+                    // ✨ 核心修复 1：图形级平滑缩放，并以“左侧”为锚点，保证排版不乱
+                    .scaleEffect(isHovered ? 1.05 : 1.0, anchor: .leading)
+                    // ✨ 核心修复 2：X轴物理平移
+                    .offset(x: isHovered ? 10 : 0)
+                    // ✨ 核心修复 3：独立挂载 easeInOut 动画！它能拦截上面的文字颜色和缩放变动，彻底消灭色彩过渡的“重影”和“闪烁”！
+                    .animation(.easeInOut(duration: 0.25), value: isHovered)
                     
                     Spacer()
                     
+                    // 4. 右下角书本装饰 Icon
                     HStack(alignment: .bottom) {
                         Spacer()
                         ZStack {
-                            Circle().fill(Color.twIndigo500.opacity(isHovered ? 0.2 : 0)).frame(width: 60, height: 60).scaleEffect(isHovered ? 1.5 : 1).blur(radius: 10)
+                            Circle()
+                                .fill(Color.twIndigo500.opacity(isHovered ? 0.15 : 0))
+                                .frame(width: 60, height: 60)
+                                .scaleEffect(isHovered ? 1.5 : 1)
+                                .blur(radius: 10)
+                            
                             Image(systemName: "book.pages.fill")
                                 .font(.system(size: 50))
-                                .foregroundColor(isHovered ? .twIndigo500 : .twSlate400.opacity(0.5))
-                                .rotationEffect(.degrees(isHovered ? -10 : 0))
-                                .scaleEffect(isHovered ? 1.2 : 1)
+                                .foregroundColor(isHovered ? .twIndigo500 : .twSlate400.opacity(0.3))
+                                // ✨ Icon 优化：像失重一样浮起来并轻微倾斜
+                                .rotationEffect(.degrees(isHovered ? -12 : 0))
+                                .scaleEffect(isHovered ? 1.15 : 1)
+                                .offset(y: isHovered ? -5 : 0)
                         }
                     }
-                    .offset(y: isHovered ? -4 : 0)
                 }
                 .padding(.vertical, 10)
             }
@@ -81,7 +100,10 @@ struct HeroBookCard: View {
         .innerGlassCardStyle(isHovered: isHovered)
         .pointingHand()
         .onHover { hovering in
-            withAnimation(.interpolatingSpring(stiffness: 100, damping: 15)) { isHovered = hovering }
+            // ✨ 核心修复 4：把极端生硬的 interpolatingSpring 换成了柔和且富有呼吸感的普通 spring
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                isHovered = hovering
+            }
         }
         .onTapGesture {
             activeCoverID = "hero-\(book.id)"
@@ -91,6 +113,7 @@ struct HeroBookCard: View {
 }
 
 // MARK: - 2. 进度管理卡片
+
 struct ReadingProgressCard: View {
     @Bindable var book: Book
     @State private var isHovered = false
@@ -157,6 +180,7 @@ struct ReadingProgressCard: View {
 }
 
 // MARK: - 3. 装饰名言卡片
+
 struct BoomDecorCard: View {
     @State private var isHovered = false
     @Environment(\.colorScheme) var colorScheme

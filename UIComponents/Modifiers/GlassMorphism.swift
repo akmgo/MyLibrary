@@ -6,19 +6,19 @@ import SwiftUI
 public enum AppleRadius {
     /// 原生系统级小圆角 (常用于小按钮、输入框) -> 12
     public static let small: CGFloat = 12
-    
+
     /// 原生窗口级标准圆角 (常用于导航栏、独立小卡片) -> 16
     public static let regular: CGFloat = 16
-    
+
     /// 现代卡片级大圆角 (常用于 Dashboard 中型模块) -> 24
     public static let card: CGFloat = 24
-    
+
     /// 弹窗与画廊级超大圆角 (常用于 Sheet 弹窗、主视觉模块) -> 32
     public static let modal: CGFloat = 32
-    
+
     /// 极限包裹级英雄圆角 (如 Dashboard 外部大底座) -> 40
     public static let hero: CGFloat = 40
-    
+
     /// ✨ 核心魔法：同心圆角计算器
     public static func nested(outer: CGFloat, padding: CGFloat) -> CGFloat {
         return max(outer - padding, 0)
@@ -29,14 +29,15 @@ public extension View {
     func appleClip(radius: CGFloat = AppleRadius.card) -> some View {
         self.clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
     }
+
     func appleBorder(_ color: Color, radius: CGFloat = AppleRadius.card, lineWidth: CGFloat = 1) -> some View {
         self.overlay(RoundedRectangle(cornerRadius: radius, style: .continuous).stroke(color, lineWidth: lineWidth))
     }
+
     func appleBackground(_ color: Color, radius: CGFloat = AppleRadius.card) -> some View {
         self.background(RoundedRectangle(cornerRadius: radius, style: .continuous).fill(color))
     }
 }
-
 
 // MARK: - 2. 动态流体光影引擎 (满屏覆盖版)
 
@@ -149,27 +150,41 @@ extension View {
             .appleBorder(isDark ? Color.white.opacity(0.1) : Color.black.opacity(0.08), radius: radius)
     }
 
-    /// ✨ 外部大区块底座样式 (已接入防闪烁链式渲染 + AppleRadius.hero: 40)
+    /// ✨ 外部大区块底座样式 (四周发散阴影 + 高亮玻璃切边)
     func outerGlassBlockStyle(radius: CGFloat = AppleRadius.hero) -> some View {
         self
             .background(Color(NSColor.windowBackgroundColor).opacity(0.4))
             .background(.ultraThinMaterial)
             .appleClip(radius: radius)
-            .appleBorder(Color.primary.opacity(0.05), radius: radius)
-            .shadow(color: Color.black.opacity(0.1), radius: 35, x: 0, y: 25)
+            // 🚀 亮度提升：加入 0.2 的白色边框，让玻璃罩边缘有物理切割的反光感
+            .appleBorder(Color.white.opacity(0.5), radius: radius, lineWidth: 1)
+            // 🚀 四周均匀阴影：将 y 设为 0，让阴影往上下左右 4 个方向均匀发散
+            .shadow(color: Color.black.opacity(0.3), radius: 45, x: 0, y: 0)
     }
 
-    /// ✨ 内部悬浮卡片样式 (结合同心圆角黄金公式计算，已接入防闪烁链式渲染)
+    /// ✨ 内部悬浮卡片样式 (发散发光态 + 悬浮高亮)
     func innerGlassCardStyle(outerRadius: CGFloat = AppleRadius.hero, paddingToOuter: CGFloat = 8, isHovered: Bool = false) -> some View {
         let radius = AppleRadius.nested(outer: outerRadius, padding: paddingToOuter)
-        
+
         return self
             .background(Color(NSColor.controlBackgroundColor).opacity(0.4))
             .background(.regularMaterial)
             .appleClip(radius: radius)
-            .appleBorder(Color.primary.opacity(0.05), radius: radius)
-            .shadow(color: Color.black.opacity(isHovered ? 0.15 : 0.05), radius: isHovered ? 25 : 15, x: 0, y: isHovered ? 18 : 8)
-            .offset(y: isHovered ? -6 : 0)
+            // 🚀 亮度提升交互：
+            // - 平时：淡淡的 0.15 白色勾边
+            // - 悬浮时：边框瞬间亮起，达到 0.6 的高亮白色，仿佛内部有光亮起
+            .appleBorder(isHovered ? Color.white.opacity(0.6) : Color.white.opacity(0.15), radius: radius, lineWidth: 1)
+            // 🚀 四周均匀阴影：
+            // - 将 y 轴无情归 0。
+            // - 悬浮时不仅阴影变大 (45)，而且颜色变深，仿佛整个卡片挡住了一束巨大的强光。
+            .shadow(color: Color.black.opacity(isHovered ? 0.3 : 0.25),
+                    radius: isHovered ? 45 : 20,
+                    x: 0,
+                    y: 0) // <-- 核心：y = 0 产生四周包围的均匀弥散感！
+
+            .offset(y: isHovered ? -8 : 0)
+            .scaleEffect(isHovered ? 1.02 : 1.0)
+            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isHovered)
     }
 }
 
@@ -188,24 +203,43 @@ extension View {
 private struct TiltCardModifier: ViewModifier {
     @State private var rotationX: CGFloat = 0
     @State private var rotationY: CGFloat = 0
+    @State private var isHovered: Bool = false // ✨ 悬浮状态跟踪
     let maxTilt: CGFloat = 5
 
     func body(content: Content) -> some View {
         content
+            // 🚀 1. 3D 倾斜
             .rotation3DEffect(.degrees(self.rotationX), axis: (x: 1, y: 0, z: 0), perspective: 1.0)
             .rotation3DEffect(.degrees(self.rotationY), axis: (x: 0, y: 1, z: 0), perspective: 1.0)
+            
+            // 🚀 2. 靠近镜头感与阴影 (只跟随 isHovered 变化)
+            .scaleEffect(self.isHovered ? 1.02 : 1.0)
+            .shadow(color: Color.black.opacity(self.isHovered ? 0.2 : 0), radius: self.isHovered ? 30 : 0, x: 0, y: self.isHovered ? 15 : 0)
+            
+            // ✨ 优化点 1：把悬浮状态独立出来！确保进出时只触发一次，动画绝不被打断
+            .onHover { hovering in
+                // 这里的动画专门为放大和阴影服务，更加舒缓
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                    self.isHovered = hovering
+                }
+            }
             .overlay(
                 GeometryReader { geo in
                     Color.clear.contentShape(Rectangle()).onContinuousHover { phase in
                         switch phase {
                         case .active(let location):
                             let center = CGPoint(x: geo.size.width / 2, y: geo.size.height / 2)
-                            withAnimation(.interactiveSpring(response: 0.3, dampingFraction: 0.7)) {
+                            // ✨ 优化点 2：这里的动画专门为倾斜服务，更加灵敏
+                            withAnimation(.interactiveSpring(response: 0.2, dampingFraction: 0.6)) {
                                 self.rotationX = ((location.y - center.y) / center.y) * -self.maxTilt
                                 self.rotationY = ((location.x - center.x) / center.x) * self.maxTilt
                             }
                         case .ended:
-                            withAnimation(.spring(response: 0.6, dampingFraction: 0.6)) { self.rotationX = 0; self.rotationY = 0 }
+                            // ✨ 鼠标离开时：回正旋转角度
+                            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                                self.rotationX = 0
+                                self.rotationY = 0
+                            }
                         }
                     }
                 }

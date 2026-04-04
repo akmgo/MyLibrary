@@ -13,18 +13,17 @@ struct CarouselWidget: View {
     @State private var scrollEventMonitor: Any?
     
     var body: some View {
+        let isDark = colorScheme == .dark
+        
         Group {
             if books.isEmpty {
                 Text("暂无书籍，去主页录入第一本吧")
                     .foregroundColor(.twSlate500)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                VStack(spacing: 30) { // ✨ 加大标题和画廊的间距
+                VStack(spacing: 30) {
                     // ================= 顶部控制台 =================
                     HStack(alignment: .center) {
-                        let isDark = colorScheme == .dark
-                                                
-                        // ✨ 替换：极其精致的“共收录”胶囊 (与画廊完全同款)
                         HStack(spacing: 8) {
                             Circle().fill(Color.twSky500).frame(width: 6, height: 6).shadow(color: Color.twSky500.opacity(0.8), radius: 4)
                             Text("共收录 \(books.count) 卷").font(.system(size: 13, weight: .bold))
@@ -38,7 +37,6 @@ struct CarouselWidget: View {
                                                 
                         Spacer()
                                                 
-                        // 右侧的滑动按钮保持不变
                         HStack(spacing: 16) {
                             CarouselNavButton(icon: "chevron.left") { moveIndex(delta: -1) }
                             CarouselNavButton(icon: "chevron.right") { moveIndex(delta: 1) }
@@ -49,7 +47,7 @@ struct CarouselWidget: View {
                     // ================= 3D 画廊 =================
                     ZStack {
                         ForEach(Array(books.enumerated()), id: \.element.id) { index, book in
-                            CarouselCardItem(book: book, index: index, currentIndex: currentIndex, totalCount: books.count)
+                            CarouselCardItem(book: book, index: index, currentIndex: currentIndex, totalCount: books.count, isDark: isDark)
                                 .onTapGesture {
                                     if index != currentIndex {
                                         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { currentIndex = index }
@@ -60,7 +58,7 @@ struct CarouselWidget: View {
                         if !books.isEmpty {
                             Rectangle()
                                 .fill(Color.black.opacity(0.001))
-                                .frame(width: 220, height: 330)
+                                .frame(width: 350, height: 525)
                                 .offset(y: -10)
                                 .zIndex(9999)
                                 .onHover { isHovered in
@@ -77,14 +75,31 @@ struct CarouselWidget: View {
                         }
                     }
                     .frame(maxWidth: .infinity)
-                    .frame(height: 550)
+                    // ✨ 空间撑开：从 550 提升到 640，完美容纳 525 高度的巨型卡片及下方文字！
+                    .frame(height: 640)
                     
-                    Ellipse()
-                        .fill(RadialGradient(colors: [Color.primary.opacity(0.08), .clear], center: .center, startRadius: 50, endRadius: 400))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 40)
-                        .offset(y: -60)
-                        .allowsHitTesting(false)
+                    // ================= 底部全息光影展台 (替代原本单调的 Ellipse) =================
+                    ZStack {
+                        // 1. 宽广的基础环境投影 (营造空间感)
+                        Ellipse()
+                            .fill(RadialGradient(colors: [isDark ? Color.white.opacity(0.08) : Color.black.opacity(0.05), .clear], center: .center, startRadius: 50, endRadius: 350))
+                            .frame(width: 1200, height: 40)
+                        
+                        // 2. 科技感渐变霓虹丝线 (打造玻璃地平线)
+                        Rectangle()
+                            .fill(LinearGradient(colors: [.clear, .twIndigo500.opacity(0.5), .twSky300.opacity(0.8), .twIndigo500.opacity(0.5), .clear], startPoint: .leading, endPoint: .trailing))
+                            .frame(width: 800, height: 1)
+                            .shadow(color: Color.twSky300.opacity(0.6), radius: 6, y: -2)
+                        
+                        // 3. 中心的高亮能量汇聚点
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 60, height: 1)
+                            .blur(radius: 1)
+                    }
+                    // ✨ 间距优化：修正之前的 -60，微调让地平线完美托住上方的卡片文字
+                    .offset(y: -20)
+                    .allowsHitTesting(false)
                 }
             }
         }
@@ -137,9 +152,8 @@ private struct CarouselNavButton: View {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .bold))
                 .foregroundColor(isDark ? .white : .twSlate700)
-                .scaleEffect(isHovered ? 1.15 : 1.0) // 内部图标微动
+                .scaleEffect(isHovered ? 1.15 : 1.0)
                 .frame(width: 48, height: 48)
-                // ✨ 一键调用全局引擎！极其清爽！
                 .liquidCircleGlass(isHovered: isHovered, isDark: isDark)
         }
         .buttonStyle(.plain)
@@ -152,7 +166,8 @@ private struct CarouselNavButton: View {
 
 private struct CarouselCardItem: View {
     let book: Book; let index: Int; let currentIndex: Int; let totalCount: Int
-    let cardWidth: CGFloat = 220; let cardHeight: CGFloat = 330
+    let isDark: Bool // 接收深色模式状态
+    let cardWidth: CGFloat = 350; let cardHeight: CGFloat = 525
     
     var body: some View {
         var diff = index - currentIndex
@@ -169,19 +184,48 @@ private struct CarouselCardItem: View {
         return VStack(spacing: 24) {
             ZStack {
                 LocalCoverView(coverData: book.coverData, fallbackTitle: book.title).frame(width: cardWidth, height: cardHeight)
-                if !isCenter { Color.black.opacity(min(0.6, Double(absDiff) * 0.2)) }
-                LinearGradient(colors: [.clear, .white.opacity(0.05), .white.opacity(0.2)], startPoint: .bottomLeading, endPoint: .topTrailing)
-                RoundedRectangle(cornerRadius: 24, style: .continuous).stroke(Color.white.opacity(0.15), lineWidth: 1)
+                
+                // 非中心卡片压暗，增加景深感
+                if !isCenter { Color.black.opacity(min(0.6, Double(absDiff) * 0.25)) }
+                
+                // ✨ 强化高光反射效果，让卡片质感更像水晶
+                LinearGradient(colors: [.clear, .white.opacity(0.02), .white.opacity(0.18)], startPoint: .bottomLeading, endPoint: .topTrailing)
+                
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(isCenter ? Color.white.opacity(0.25) : Color.white.opacity(0.1), lineWidth: isCenter ? 1.5 : 1)
             }
-            .frame(width: cardWidth, height: cardHeight).clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .shadow(color: isCenter ? Color.indigo.opacity(0.5) : Color.black.opacity(0.3), radius: isCenter ? 30 : 15, x: 0, y: isCenter ? 20 : 10)
+            .frame(width: cardWidth, height: cardHeight)
+            // 接入系统的柔和切角
+            .appleClip(radius: AppleRadius.card)
+            // ✨ 中心卡片散发蓝紫色神秘光晕，两侧卡片保持深邃阴影
+            .shadow(color: isCenter ? Color.twIndigo500.opacity(isDark ? 0.4 : 0.2) : Color.black.opacity(0.4),
+                    radius: isCenter ? 40 : 15,
+                    x: 0,
+                    y: isCenter ? 25 : 10)
             
             VStack(spacing: 6) {
-                Text(book.title).font(.system(size: 24, weight: .black, design: .rounded)).foregroundColor(.primary).lineLimit(1)
-                Text(book.author.uppercased()).font(.system(size: 14, weight: .bold, design: .rounded)).tracking(2).foregroundColor(.indigo)
-            }.frame(width: cardWidth + 80).opacity(isCenter ? 1 : 0).offset(y: isCenter ? 0 : 20).blur(radius: isCenter ? 0 : 5)
+                Text(book.title)
+                    .font(.system(size: 30, weight: .semibold, design: .rounded))
+                    .foregroundColor(isDark ? .white : .twSlate800)
+                    .lineLimit(1)
+                    // 中心标题轻微发光
+                    .shadow(color: isDark ? Color.white.opacity(0.2) : .clear, radius: 4)
+                
+                Text(book.author.uppercased())
+                    .font(.system(size: 18, weight: .medium, design: .rounded))
+                    .tracking(3)
+                    .foregroundColor(.twIndigo500)
+            }
+            .frame(width: cardWidth + 100)
+            .opacity(isCenter ? 1 : 0)
+            .offset(y: isCenter ? 0 : 20)
+            .blur(radius: isCenter ? 0 : 5)
         }
-        .rotation3DEffect(.degrees(rotateY), axis: (x: 0, y: 1, z: 0), perspective: 0.8).scaleEffect(scale).offset(x: translateX, y: isCenter ? -10 : 0)
-        .zIndex(Double(100 - absDiff)).opacity(cardOpacity).animation(.spring(response: 0.6, dampingFraction: 0.8), value: currentIndex)
+        .rotation3DEffect(.degrees(rotateY), axis: (x: 0, y: 1, z: 0), perspective: 0.8)
+        .scaleEffect(scale)
+        .offset(x: translateX, y: isCenter ? -10 : 0)
+        .zIndex(Double(100 - absDiff))
+        .opacity(cardOpacity)
+        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: currentIndex)
     }
 }

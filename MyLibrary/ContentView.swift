@@ -10,7 +10,7 @@ struct ContentView: View {
     @Query(filter: #Predicate<Book> { $0.status == "READING" }) var readingBooks: [Book]
     
     let pagePadding: CGFloat = 30
-    let widgetSpacing: CGFloat = 60
+    let widgetSpacing: CGFloat = 40
     let sectionSpacing: CGFloat = 60
     
     @Namespace private var namespace
@@ -179,22 +179,36 @@ struct ContentView: View {
     }
     
     private var homeScrollContent: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 0) {
-                HeaderView().padding(.bottom, 20)
+            ScrollView(.vertical, showsIndicators: false) {
                 
-                VStack(spacing: sectionSpacing) {
-                    HStack(alignment: .top, spacing: widgetSpacing) {
-                        CurrentReadingWidget(heroBook: readingBooks.first, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID, readingCount: readingBooks.count)
-                            .frame(maxWidth: .infinity, alignment: .top)
-                        DashboardWidget().frame(maxWidth: .infinity, alignment: .top)
-                    }.padding(.bottom, sectionSpacing)
-                }.frame(maxWidth: .infinity)
+                // ✨ 魔法 1：最外层增加一个霸占全部屏幕宽度的 VStack，它会默认把它内部的所有内容居中！
+                VStack {
+                    
+                    // 内部的对齐逻辑：保持内容左对齐（让 Header 和卡片左边缘对齐）
+                    VStack(alignment: .leading, spacing: 0) {
+                        HeaderView().padding(.bottom, 20)
+                        
+                        VStack(spacing: sectionSpacing) {
+                            HStack(alignment: .top, spacing: widgetSpacing) {
+                                CurrentReadingWidget(heroBook: readingBooks.first, namespace: namespace, selectedBook: $selectedBook, activeCoverID: $activeCoverID, readingCount: readingBooks.count)
+                                    .frame(maxWidth: .infinity, alignment: .top)
+                                
+                                DashboardWidget()
+                                    .frame(maxWidth: .infinity, alignment: .top)
+                            }
+                            .padding(.bottom, sectionSpacing)
+                        }
+                    }
+                    // ✨ 魔法 2：把 1280 的最大宽度限制，挂在这个内部的内容块上
+                    .frame(maxWidth: 1380)
+                    
+                }
+                .frame(maxWidth: .infinity) // <-- 强制外层容器撑满屏幕
+                .padding(.horizontal, pagePadding)
+                .padding(.top, 120)
+                
             }
-            .padding(.horizontal, pagePadding)
-            .padding(.top, 120)
         }
-    }
 }
 
 // MARK: - 专属组件：右上角灵动岛深浅模式按钮

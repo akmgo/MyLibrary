@@ -16,54 +16,58 @@ struct GalleryBookCardView: View {
     
     var body: some View {
         let isDark = colorScheme == .dark
-        
-        let titleColor = isHovered ? Color.twIndigo600 : (isDark ? Color.white : Color.twSlate800)
+        let titleColor = isHovered ? Color.twIndigo500 : (isDark ? Color.white : Color.twSlate800)
         let authorColor = isDark ? Color.twSlate400 : Color.twSlate500
-        let hoverShadowColor = Color.black.opacity(isDark ? 0.4 : 0.15)
         
-        VStack(alignment: .leading, spacing: 12) {
-            // ================= 1. 纯净的封面区 =================
+        VStack(alignment: .leading, spacing: 16) {
+            // ================= 1. 极致悬浮封面区 =================
             ZStack(alignment: .topTrailing) {
                 if selectedBook?.id != book.id {
-                    // ✨ 修复 1：改回你目前稳定高性能的传参方式
                     LocalCoverView(coverData: book.coverData, fallbackTitle: book.title)
-                        .frame(width: 160, height: 240)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(isDark ? Color.white.opacity(0.1) : Color.black.opacity(0.05), lineWidth: 1))
+                        .frame(width: GalleryConfig.coverWidth, height: GalleryConfig.coverHeight)
+                        // ✨ 用系统标准平滑曲线裁切封面，保证圆角完美
+                        .appleClip(radius: AppleRadius.regular)
                         .matchedGeometryEffect(id: "gallery-\(book.id)", in: namespace, isSource: selectedBook?.id != book.id)
-                        .opacity(selectedBook?.id == book.id ? 0.001 : 1.0)
                 } else {
-                    Color.clear.frame(width: 160, height: 240)
+                    Color.clear.frame(width: GalleryConfig.coverWidth, height: GalleryConfig.coverHeight)
                 }
             }
-            .frame(width: 160, height: 240)
-            .shadow(color: isHovered ? hoverShadowColor : .clear, radius: isHovered ? 20 : 0, y: isHovered ? 12 : 0)
+            .frame(width: GalleryConfig.coverWidth, height: GalleryConfig.coverHeight)
+            // ✨ 1. 精准的系统级弧度边框：严格跟随封面同样的 AppleRadius.regular 弧线！
+            .appleBorder(isHovered ? Color.white.opacity(0.6) : (isDark ? Color.white.opacity(0.15) : Color.black.opacity(0.05)), radius: AppleRadius.regular, lineWidth: 1)
+            // ✨ 2. 四周发散的大阴影，只投射在封面底下
+            .shadow(color: Color.black.opacity(isHovered ? 0.35 : 0.15), radius: isHovered ? 30 : 10, x: 0, y: isHovered ? 15 : 5)
+            // ✨ 3. 物理脱离感：仅仅封面升空并放大，下方的文字不改变位置
             .offset(y: isHovered ? -8 : 0)
-            .scaleEffect(isHovered ? 1.02 : 1.0)
+            .scaleEffect(isHovered ? 1.03 : 1.0)
+            // 确保所有的动画丝滑过渡
+            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isHovered)
             .zIndex(selectedBook?.id == book.id ? 999 : 0)
             
-            // ================= 2. 紧凑的文本信息区 =================
-            VStack(alignment: .leading, spacing: 2) {
+            // ================= 2. 文本信息区 =================
+            VStack(alignment: .leading, spacing: 4) {
                 Text(book.title)
                     .font(.system(size: 16, weight: .black))
                     .foregroundColor(titleColor)
                     .lineLimit(1)
+                    .animation(.easeInOut(duration: 0.25), value: isHovered)
+                
                 Text(book.author)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(authorColor)
                     .lineLimit(1)
-                    .padding(.top, 2)
                 
                 if isFinishedTab && book.status == "FINISHED" {
                     GalleryStatsView(book: book, isDark: isDark, ratingTexts: ratingTexts)
+                        .padding(.top, 4)
                 }
             }
-            .padding(.horizontal, 4)
-            .frame(width: 160, alignment: .leading)
+            .frame(width: GalleryConfig.coverWidth, alignment: .leading)
             .zIndex(0)
         }
         .contentShape(Rectangle())
-        .onHover { h in withAnimation(.spring(response: 0.35, dampingFraction: 0.65)) { isHovered = h } }
+        // ✨ 将悬浮检测区域挂在整个 VStack 上，但仅封面做视觉变化
+        .onHover { h in isHovered = h }
         .pointingHand()
         .zIndex(selectedBook?.id == book.id ? 999 : 0)
     }
@@ -79,7 +83,7 @@ private struct GalleryStatsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Divider()
                 .background(isDark ? Color.twSlate800.opacity(0.6) : Color.twSlate200.opacity(0.6))
-                .padding(.top, 10)
+                .padding(.top, 6)
             
             // 1. 评分行
             HStack(alignment: .center) {
@@ -88,7 +92,6 @@ private struct GalleryStatsView: View {
                         ForEach(1 ... 5, id: \.self) { i in
                             Image(systemName: "star.fill")
                                 .font(.system(size: 10))
-                                // ✨ 修复 2：将未定义的 twAmber 替换为原生的 yellow
                                 .foregroundColor(i <= book.rating ? .yellow : (isDark ? .twSlate700 : .twSlate200))
                                 .shadow(color: i <= book.rating ? Color.yellow.opacity(0.4) : .clear, radius: 2)
                         }
@@ -103,7 +106,6 @@ private struct GalleryStatsView: View {
                 if book.rating > 0 {
                     Text(ratingTexts[book.rating])
                         .font(.system(size: 10, weight: .bold))
-                        // ✨ 修复 2：替换为原生的 orange
                         .foregroundColor(isDark ? .orange : Color.orange.opacity(0.8))
                 }
             }

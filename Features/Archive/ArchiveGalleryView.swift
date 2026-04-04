@@ -1,6 +1,18 @@
 import SwiftData
 import SwiftUI
 
+// MARK: - ✨ 全局画廊布局配置
+public enum GalleryConfig {
+    /// 封面真实宽度
+    public static let coverWidth: CGFloat = 200
+    /// 封面真实高度 (严格保持 2:3 比例)
+    public static let coverHeight: CGFloat = 300
+    /// 卡片之间的水平间距
+    public static let horizontalSpacing: CGFloat = 32
+    /// 上下行之间的垂直间距
+    public static let verticalSpacing: CGFloat = 40
+}
+
 struct ArchiveGalleryView: View {
     @Query var books: [Book]
     let namespace: Namespace.ID
@@ -14,21 +26,17 @@ struct ArchiveGalleryView: View {
     @Namespace private var tabNamespace
     
     let tabs: [(String, String)] = [("UNREAD", "待读"), ("ALL", "全部"), ("FINISHED", "已读")]
-    let horizontalSpacing: CGFloat = 32
-    let verticalSpacing: CGFloat = 40
     let topSpacing: CGFloat = 170
     
     var body: some View {
-        // ✨ 完全脱去背景代码，只保留透明的 ScrollView
         ScrollView {
             gridView
-                .padding(.horizontal, 60)
+                .padding(.horizontal, 40)
                 .padding(.top, topSpacing)
                 .padding(.bottom, 60)
         }
         .ignoresSafeArea(edges: .top)
         .onAppear { updateDisplayBooks(animate: false) }
-        // 只有在用户主动点击 Tab 切换分类（比如从“全部”切到“已读”）时，才触发排序动画
         .onChange(of: books) { _, _ in updateDisplayBooks(animate: true) }
     }
     
@@ -39,11 +47,14 @@ struct ArchiveGalleryView: View {
         if displayBooks.isEmpty {
             VStack {
                 Text("暂无对应的书籍记录").font(.system(size: 18, weight: .bold)).foregroundColor(.twSlate400).tracking(4)
-            }.frame(maxWidth: .infinity, minHeight: 300)
+            }
+            .frame(maxWidth: .infinity, minHeight: 300)
         } else {
-            let columns = [GridItem(.adaptive(minimum: 160, maximum: 240), spacing: horizontalSpacing)]
+            // ✨ 直接使用封面的宽度作为网格列宽
+            let columns = [GridItem(.adaptive(minimum: GalleryConfig.coverWidth, maximum: GalleryConfig.coverWidth + 20), spacing: GalleryConfig.horizontalSpacing)]
             
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 32) {
+                // ======= 顶部控制栏 =======
                 HStack(alignment: .center) {
                     HStack(spacing: 8) {
                         Circle().fill(Color.twSky500).frame(width: 6, height: 6).shadow(color: Color.twSky500.opacity(0.8), radius: 4)
@@ -62,30 +73,25 @@ struct ArchiveGalleryView: View {
                         ForEach(tabs, id: \.0) { tab in
                             let isActive = activeTab == tab.0
                             let isHovered = hoveredTab == tab.0
-                                                                            
+                            
                             let activeColor = isDark ? Color.white : Color.twSlate900
                             let inactiveColor = isDark ? Color.twSlate400 : Color.twSlate500
                             let hoverColor = isDark ? Color.white.opacity(0.85) : Color.twSlate700
-                                                                            
+                            
                             Button(action: {
                                 withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { activeTab = tab.0 }
                                 updateDisplayBooks(animate: true)
                             }) {
                                 ZStack {
-                                    // ✨ 同样去掉了灰底，保持极简
                                     if isActive {
-                                        // ✨ 替换为 AppleRadius.small
                                         RoundedRectangle(cornerRadius: AppleRadius.small, style: .continuous)
                                             .fill(isDark ? Color.white.opacity(0.15) : Color.black.opacity(0.08))
                                             .matchedGeometryEffect(id: "gallery-tab", in: tabNamespace)
                                     }
-                                                                                        
                                     Text(tab.1).font(.system(size: 13, weight: .bold))
-                                        // ✨ 悬浮时字体提亮
                                         .foregroundColor(isActive ? activeColor : (isHovered ? hoverColor : inactiveColor))
                                 }
                                 .frame(height: 32).frame(maxWidth: .infinity)
-                                // ✨ 悬浮时微微跃起放大
                                 .scaleEffect((isHovered || isActive) ? 1.05 : 1.0)
                             }
                             .buttonStyle(.plain).pointingHand()
@@ -95,12 +101,12 @@ struct ArchiveGalleryView: View {
                         }
                     }
                     .padding(4).frame(width: 200)
-                    // ✨ 替换为 AppleRadius.regular 及其新参数名
                     .liquidGlass(radius: AppleRadius.regular, isDark: isDark)
                 }
                 .padding(.horizontal, 10)
                 
-                LazyVGrid(columns: columns, spacing: verticalSpacing) {
+                // ======= 书籍网格 =======
+                LazyVGrid(columns: columns, spacing: GalleryConfig.verticalSpacing) {
                     ForEach(displayBooks, id: \.id) { book in
                         GalleryBookCardView(book: book,
                                             showStatus: activeTab == "ALL",
@@ -109,11 +115,8 @@ struct ArchiveGalleryView: View {
                                             activeCoverID: activeCoverID,
                                             selectedBook: selectedBook)
                             .onTapGesture {
-                                // ✨ 设置起飞坐标，并包裹在弹簧动画中触发选中
                                 activeCoverID = "gallery-\(book.id)"
-                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                                    selectedBook = book
-                                }
+                                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { selectedBook = book }
                             }
                             .zIndex(selectedBook?.id == book.id ? 999 : 0)
                             .transition(.asymmetric(
@@ -124,6 +127,7 @@ struct ArchiveGalleryView: View {
                 }
                 .animation(.spring(response: 0.5, dampingFraction: 0.8), value: displayBooks)
             }
+            // ✨ 去掉了大底座，还原干爽视觉
         }
     }
     
